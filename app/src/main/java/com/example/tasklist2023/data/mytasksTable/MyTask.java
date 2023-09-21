@@ -15,14 +15,13 @@ public class MyTask
     public int importance;
     /** نص المهمة */
     public String text;
-    public long time; /**  زمن بناء المهمة*/
-    /**
-     * رقم موضوع المهمة
-     */
+    /**  زمن بناء المهمة*/
+    public long time;
+    /** هل تمت المهمة */
+    public boolean isCompleted;
+    /**رقم موضوع المهمة*/
     long subjId;
-    /**
-     * رقم المستعمل الذي اضاف المهمة
-     */
+    /**رقم المستعمل الذي اضاف المهمة*/
     long userId;
 
     @Override
@@ -31,6 +30,8 @@ public class MyTask
                 "keyId=" + keyId +
                 ", importance=" + importance +
                 ", text='" + text + '\'' +
+                ", time=" + time +
+                ", isCompleted=" + isCompleted +
                 ", subjId=" + subjId +
                 ", userId=" + userId +
                 '}';
