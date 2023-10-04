@@ -6,6 +6,10 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.example.tasklist2023.data.AppDataBase;
+import com.example.tasklist2023.data.mySubjectsTable.MySubject;
+import com.example.tasklist2023.data.mySubjectsTable.MySubjectQuery;
+
 public class MainActivity extends AppCompatActivity {
 
     @Override
@@ -15,6 +19,23 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Log.d("SM","onCreate");
         Toast.makeText(this, "onCreate", Toast.LENGTH_LONG).show();
+
+        //بناء قاعدة بيانات وارجاع مؤشر عليها1
+        AppDataBase db=AppDataBase.getDB(getApplicationContext());
+        //2 مؤشر لكائن عمليات  لجدول
+        MySubjectQuery subjectQuery = db.getMySubjectQuery();
+        //3  بناء كائن من نوع الجدول وتحديد قيم الصفات
+        MySubject s1=new MySubject();
+        s1.setTitle("Math");
+        MySubject s2=new MySubject();
+        s2.title="Computers";
+        //4 اضافة كائن للجدول
+        subjectQuery.insert(s1);
+        subjectQuery.insert(s2);
+
+
+
+
     }
 
     @Override
