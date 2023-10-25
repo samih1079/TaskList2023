@@ -13,6 +13,8 @@ public class MyTask
     public long keyId;
     /** درجة الاهمية 1-5 */
     public int importance;
+    /**عنوان قصير */
+    public String shortTitle;
     /** نص المهمة */
     public String text;
     /**  زمن بناء المهمة*/
