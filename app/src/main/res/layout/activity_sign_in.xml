@@ -14,7 +14,7 @@
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_margin="50dp">
+            android:layout_margin="5dp">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etEmail"
@@ -29,7 +29,7 @@
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_margin="50dp">
+            android:layout_margin="5dp">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etPassword"
@@ -45,16 +45,20 @@
             android:id="@+id/btnSignIn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="30dp"
+            android:layout_margin="5dp"
             android:layout_weight="1"
-            android:text="Sign In" />
+            android:onClick="onClickSignIn"
+            android:text="Sign In"
+            app:cornerRadius="20dp" />
 
         <Button
             android:id="@+id/btnSignUp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="30dp"
-            android:text="Sign Up" />
+            android:layout_margin="5dp"
+            android:onClick="onClickSignUp"
+            android:text="Sign Up"
+            app:cornerRadius="20dp" />
     </LinearLayout>
 
 </RelativeLayout>
