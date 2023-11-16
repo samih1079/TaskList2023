@@ -76,19 +76,23 @@ public class SignUpActivity extends AppCompatActivity {
         {
             AppDataBase db = AppDataBase.getDB(getApplicationContext());
             MyUserQuery userQuery = db.getMyUserQuery();
+            //فحص هل البريد إلكتروني موجود من قبل أي تم التسجيل من قبل
             if(userQuery.checkEmail(email)!=null)
             {
                 etEmail.setError("found email");
             }
-            else
+            else// إن لم يكن البريد موجودا نقوم ببناء كائن للمستعمل وإدخاله في الجدول المستعملينMyUser
             {
+                //بناء الكائن
                 MyUser myUser=new MyUser();
+                //تحديد قيم الصفات بالقيم التي استخرجناها
                 myUser.email=email;
                 myUser.fullName=name;
                 myUser.phone=phone;
                 myUser.passw=password;
-
+                //إضافة الكائن الجديد للجدول
                 userQuery.insert(myUser);
+                //اغلاق الشاشة الحالية
                 finish();
             }
         }

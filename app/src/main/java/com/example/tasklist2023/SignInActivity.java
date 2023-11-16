@@ -61,18 +61,19 @@ public class SignInActivity extends AppCompatActivity {
             etPassword.setError("Wrong Password");
         }
 
-        if (isAllOK) {
+        if (isAllOK)
+        {
             Toast.makeText(this, "All OK", Toast.LENGTH_SHORT).show();
             //بناء قاعدة بيانات وارجاع مؤشر عليها1
             AppDataBase db=AppDataBase.getDB(getApplicationContext());
             //2 مؤشر لكائن عمليات  الجدول
             MyUserQuery userQuery=db.getMyUserQuery();
-
+            //3 استدعاء العملية التي تنفذ الاستعلام الذي يفحص البريد وكلمة المرور ويعيد كائنا ان كان موجودا أو null إن لم يكن موجود
             MyUser myUser = userQuery.checkEmailPassw(email, password);
-            if(myUser==null)
+            if(myUser==null)//هل لا يوجد كائن حسب الإيميل والباسورد
                 Toast.makeText(this, "Wrong Email Or Password", Toast.LENGTH_LONG).show();
             else
-            {
+            {//أن كان هنالك حساب حساب الإيميل والباسورد ننتقل إلى الشاشة الرئيسية
                 Intent i=new Intent(SignInActivity.this,MainActivity.class);
                 startActivity(i);
                 finish();
