@@ -2,8 +2,10 @@ package com.example.tasklist2023;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -11,20 +13,28 @@ import android.widget.Toast;
 import com.example.tasklist2023.data.AppDataBase;
 import com.example.tasklist2023.data.mySubjectsTable.MySubject;
 import com.example.tasklist2023.data.mySubjectsTable.MySubjectQuery;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     //spnr1 تعريف صفة للكائن المرئي
     private Spinner spnrSubject;
-
+    private FloatingActionButton fabAdd;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         //spnr2 وضع مؤشر الصفة على الكائن المرئي الموجود بواجهة المستعمل
        spnrSubject = findViewById(R.id.spnrSubject);
-
+       fabAdd=findViewById(R.id.fabAdd);
+       fabAdd.setOnClickListener(new View.OnClickListener() {
+           @Override
+           public void onClick(View view) {
+               Intent i= new Intent(MainActivity.this,AddTaskActivity.class);
+               startActivity(i);
+           }
+       });
         //spnr3 بناء الوسيط وتحديد واهة تنسيق لمعطى واحد
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
