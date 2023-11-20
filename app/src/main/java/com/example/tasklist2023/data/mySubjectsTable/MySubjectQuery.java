@@ -39,6 +39,8 @@ public interface MySubjectQuery {
     @Delete
     void deleteTask(MySubject...s);
 
-    @Query("DELETE FROM MySubject WHERE key_id=:kid")
-    void delete(long kid);
+    @Query("DELETE FROM MySubject WHERE key_id=:keyid")
+    void delete(long keyid);
+    @Query("SELECT * From MySubject WHERE title=:sub")
+    MySubject checkSubject(String sub);
 }

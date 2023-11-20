@@ -19,7 +19,7 @@ version
 عند تغيير اي شي يخص جدول او داول علينا تغيير رقم الاصدار
 ليتم بناء قاعدة البيانات من جديد
  */
-@Database(entities = {MyUser.class, MySubject.class, MyTask.class},version = 2)
+@Database(entities = {MyUser.class, MySubject.class, MyTask.class},version = 4)
 /**
  * الفئة المسؤولة عن بناء قاعدة البايانات بكل جداولها
  * وتوفر لنا كائن للتعامل مع قاعدة البيانات

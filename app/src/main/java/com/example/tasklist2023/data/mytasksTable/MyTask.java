@@ -22,9 +22,9 @@ public class MyTask
     /** هل تمت المهمة */
     public boolean isCompleted;
     /**رقم موضوع المهمة*/
-    long subjId;
+    public long subjId;
     /**رقم المستعمل الذي اضاف المهمة*/
-    long userId;
+    public long userId;
 
     @Override
     public String toString() {

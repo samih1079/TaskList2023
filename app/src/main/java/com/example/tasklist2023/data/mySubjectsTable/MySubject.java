@@ -1,5 +1,6 @@
 package com.example.tasklist2023.data.mySubjectsTable;
 
+import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 

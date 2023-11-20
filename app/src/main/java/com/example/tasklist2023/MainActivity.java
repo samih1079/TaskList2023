@@ -30,48 +30,55 @@ public class MainActivity extends AppCompatActivity {
         fabAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                Intent i=new Intent(MainActivity.this, AddTaskActivity.class);
+                startActivity(i);
             }
         });
         //spnr2 وضع مؤشر الصفة على الكائن المرئي الموجود بواجهة المستعمل
        spnrSubject = findViewById(R.id.spnrSubject);
+        initSubjectSpnr();
 
 
 
-        //spnr3 بناء الوسيط وتحديد واهة تنسيق لمعطى واحد
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        //spnr4 data source مصدر معطيات (ممكن ان يكون قائمة من قاعدة بيانات مثلا)
-        String[] ar = {"Math", "CS", "Phs", "Arb", "Eng"};
-        //spnr5 تحديد المعطيات للوسيط
-        adapter.addAll(ar);
-        //spnr6 ريط الكائن المرئي بالوسيط
-        spnrSubject.setAdapter(adapter);
 
 
         Log.d("SM","onCreate");
         Toast.makeText(this, "onCreate", Toast.LENGTH_LONG).show();
 
-        //بناء قاعدة بيانات وارجاع مؤشر عليها1
+//        //بناء قاعدة بيانات وارجاع مؤشر عليها1
+//        AppDataBase db=AppDataBase.getDB(getApplicationContext());
+//        //2 مؤشر لكائن عمليات  لجدول
+//        MySubjectQuery subjectQuery = db.getMySubjectQuery();
+//        //3  بناء كائن من نوع الجدول وتحديد قيم الصفات
+//        MySubject s1=new MySubject();
+//        s1.setTitle("Math");
+//        MySubject s2=new MySubject();
+//        s2.title="Computers";
+//        //4 اضافة كائن للجدول
+//        subjectQuery.insert(s1);
+//        subjectQuery.insert(s2);
+//
+//        List<MySubject> allSubjects = subjectQuery.getAllSubjects();
+//        for (MySubject subject : allSubjects) {
+//            Log.d("SA",subject.title);
+//        }
+
+
+
+    }
+
+    private void initSubjectSpnr() {
         AppDataBase db=AppDataBase.getDB(getApplicationContext());
-        //2 مؤشر لكائن عمليات  لجدول
         MySubjectQuery subjectQuery = db.getMySubjectQuery();
-        //3  بناء كائن من نوع الجدول وتحديد قيم الصفات
-        MySubject s1=new MySubject();
-        s1.setTitle("Math");
-        MySubject s2=new MySubject();
-        s2.title="Computers";
-        //4 اضافة كائن للجدول
-        subjectQuery.insert(s1);
-        subjectQuery.insert(s2);
 
         List<MySubject> allSubjects = subjectQuery.getAllSubjects();
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_dropdown_item_1line);
         for (MySubject subject : allSubjects) {
-            Log.d("SA",subject.title);
+            adapter.add(subject.title);
         }
-
-
-
+        spnrSubject.setAdapter(adapter);
     }
 
     @Override
