@@ -73,6 +73,19 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * تجهيز قائمة جميع المهمات وعرضها ب ListView
+     */
+    private void initAllListView() {
+        AppDataBase db=AppDataBase.getDB(getApplicationContext());
+        MyTaskQuery taskQuery = db.getMyTaskQuery();
+
+        List<MyTask> allTasks = taskQuery.getAllTasks();
+
+        ArrayAdapter<MyTask> tsksAdapter=new ArrayAdapter<MyTask>(this, android.R.layout.simple_list_item_1);
+        tsksAdapter.addAll(allTasks);
+        lstTasks.setAdapter(tsksAdapter);
+    }
     @Override
     protected void onResume() {
         super.onResume();
@@ -80,42 +93,33 @@ public class MainActivity extends AppCompatActivity {
         initSubjectSpnr();
     }
 
-    private void initAllListView() {
-        AppDataBase db=AppDataBase.getDB(getApplicationContext());
-        MyTaskQuery taskQuery = db.getMyTaskQuery();
-
-        List<MyTask> allTasks = taskQuery.getAllTasks();
-
-        ArrayAdapter<MyTask> tsksAdapter=new ArrayAdapter<MyTask>(getApplicationContext(), android.R.layout.simple_list_item_1);
-        tsksAdapter.addAll(allTasks);
-        lstTasks.setAdapter(tsksAdapter);
-
-
-    }
-
+    /**
+     * عملية تجهيز السبنر بالمواضيع
+     */
     private void initSubjectSpnr() {
-        AppDataBase db=AppDataBase.getDB(getApplicationContext());
-        MySubjectQuery subjectQuery = db.getMySubjectQuery();
-
-        List<MySubject> allSubjects = subjectQuery.getAllSubjects();
-
+        AppDataBase db = AppDataBase.getDB(getApplicationContext());//قاعدة بناء
+        MySubjectQuery subjectQuery = db.getMySubjectQuery();//عمليات جدول المواضيع
+        List<MySubject> allSubjects = subjectQuery.getAllSubjects();//استخراج جميع المواضيع
+        //تجهيز الوسيط
         ArrayAdapter<String> subjectAdapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_dropdown_item_1line);
-        subjectAdapter.add("ALL");
-        for (MySubject subject : allSubjects) {
+                android.R.layout.simple_dropdown_item_1line);//
+        subjectAdapter.add("ALL");//ستظهر اولا بالسبنر تعني عرض جميع المهمات
+        for (MySubject subject : allSubjects) {//اضافة المواضيع للوسيط
             subjectAdapter.add(subject.title);
         }
-        spnrSubject.setAdapter(subjectAdapter);
-
+        spnrSubject.setAdapter(subjectAdapter);//ربط السبنر بالوسيط
+        //معالج حدث لاختيار موضوع بالسبنر
         spnrSubject.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-
+                //استخراج الموضوع حسب رقمه الترتيبي i
                 String item = subjectAdapter.getItem(i);
-                if(item.equals("ALL"))
+                if(item.equals("ALL"))//هذه يعني عرض جميع المهام
                     initAllListView();
                 else {
+                    //استخراج كائن الموضوع الذي اخترناه لاستخراج رقمه id
                     MySubject subject = subjectQuery.checkSubject(item);
+                    //استدعاء العملية التي تجهز القائمة حسب رقم الموضوع id
                     initListViewBySubjId(subject.getKey_id());
                 }
             }
@@ -125,16 +129,20 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * تجهيز قائمة المهمات حسب رقم الموضوع
+     * @param key_id رقم الموضوع
+     */
     private void initListViewBySubjId(long key_id)
     {
         AppDataBase db=AppDataBase.getDB(getApplicationContext());
         MyTaskQuery taskQuery = db.getMyTaskQuery();
-
+                                //يجب اضافة عملية تعيد جميع المهمات حسب رقم الموضوع
         List<MyTask> allTasks = taskQuery.getTasksBySubjId(key_id);
 
-        ArrayAdapter<MyTask> tsksAdapter=new ArrayAdapter<MyTask>(getApplicationContext(), android.R.layout.simple_list_item_1);
-        tsksAdapter.addAll(allTasks);
-        lstTasks.setAdapter(tsksAdapter);
+        ArrayAdapter<MyTask> taksAdapter=new ArrayAdapter<MyTask>(this, android.R.layout.simple_list_item_1);
+        taksAdapter.addAll(allTasks);
+        lstTasks.setAdapter(taksAdapter);
     }
 
 
