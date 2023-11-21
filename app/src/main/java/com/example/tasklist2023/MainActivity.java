@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
@@ -98,12 +99,42 @@ public class MainActivity extends AppCompatActivity {
 
         List<MySubject> allSubjects = subjectQuery.getAllSubjects();
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+        ArrayAdapter<String> subjectAdapter = new ArrayAdapter<String>(this,
                 android.R.layout.simple_dropdown_item_1line);
+        subjectAdapter.add("ALL");
         for (MySubject subject : allSubjects) {
-            adapter.add(subject.title);
+            subjectAdapter.add(subject.title);
         }
-        spnrSubject.setAdapter(adapter);
+        spnrSubject.setAdapter(subjectAdapter);
+
+        spnrSubject.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+
+                String item = subjectAdapter.getItem(i);
+                if(item.equals("ALL"))
+                    initAllListView();
+                else {
+                    MySubject subject = subjectQuery.checkSubject(item);
+                    initListViewBySubjId(subject.getKey_id());
+                }
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+            }
+        });
+    }
+
+    private void initListViewBySubjId(long key_id)
+    {
+        AppDataBase db=AppDataBase.getDB(getApplicationContext());
+        MyTaskQuery taskQuery = db.getMyTaskQuery();
+
+        List<MyTask> allTasks = taskQuery.getTasksBySubjId(key_id);
+
+        ArrayAdapter<MyTask> tsksAdapter=new ArrayAdapter<MyTask>(getApplicationContext(), android.R.layout.simple_list_item_1);
+        tsksAdapter.addAll(allTasks);
+        lstTasks.setAdapter(tsksAdapter);
     }
 
 
