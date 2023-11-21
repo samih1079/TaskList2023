@@ -7,12 +7,15 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.example.tasklist2023.data.AppDataBase;
 import com.example.tasklist2023.data.mySubjectsTable.MySubject;
 import com.example.tasklist2023.data.mySubjectsTable.MySubjectQuery;
+import com.example.tasklist2023.data.mytasksTable.MyTask;
+import com.example.tasklist2023.data.mytasksTable.MyTaskQuery;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.List;
@@ -21,6 +24,7 @@ public class MainActivity extends AppCompatActivity {
     //spnr1 تعريف صفة للكائن المرئي
     private Spinner spnrSubject;
     private FloatingActionButton fabAdd;
+    private ListView lstTasks;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,13 +41,14 @@ public class MainActivity extends AppCompatActivity {
         //spnr2 وضع مؤشر الصفة على الكائن المرئي الموجود بواجهة المستعمل
        spnrSubject = findViewById(R.id.spnrSubject);
         initSubjectSpnr();
+        lstTasks=findViewById(R.id.lstvTasks);
+        initAllListView();
 
 
 
 
-
-        Log.d("SM","onCreate");
-        Toast.makeText(this, "onCreate", Toast.LENGTH_LONG).show();
+//        Log.d("SM","onCreate");
+//        Toast.makeText(this, "onCreate", Toast.LENGTH_LONG).show();
 
 //        //بناء قاعدة بيانات وارجاع مؤشر عليها1
 //        AppDataBase db=AppDataBase.getDB(getApplicationContext());
@@ -67,6 +72,26 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        initAllListView();
+        initSubjectSpnr();
+    }
+
+    private void initAllListView() {
+        AppDataBase db=AppDataBase.getDB(getApplicationContext());
+        MyTaskQuery taskQuery = db.getMyTaskQuery();
+
+        List<MyTask> allTasks = taskQuery.getAllTasks();
+
+        ArrayAdapter<MyTask> tsksAdapter=new ArrayAdapter<MyTask>(getApplicationContext(), android.R.layout.simple_list_item_1);
+        tsksAdapter.addAll(allTasks);
+        lstTasks.setAdapter(tsksAdapter);
+
+
+    }
+
     private void initSubjectSpnr() {
         AppDataBase db=AppDataBase.getDB(getApplicationContext());
         MySubjectQuery subjectQuery = db.getMySubjectQuery();
@@ -81,39 +106,5 @@ public class MainActivity extends AppCompatActivity {
         spnrSubject.setAdapter(adapter);
     }
 
-    @Override
-    protected void onRestart() {
-        super.onRestart();
-        Log.d("SM","onRestart");
-        Toast.makeText(this, "onCreate", Toast.LENGTH_LONG).show();
 
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Log.d("SM","onResume");
-        Toast.makeText(this, "onResume", Toast.LENGTH_LONG).show();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        Log.d("SM","onPause");
-        Toast.makeText(this, "onPause", Toast.LENGTH_LONG).show();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        Log.d("SM","onStop");
-        Toast.makeText(this, "onStop", Toast.LENGTH_LONG).show();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        Log.d("SM","onDestroy");
-        Toast.makeText(this, "onDestroy", Toast.LENGTH_LONG).show();
-    }
 }
