@@ -27,7 +27,7 @@ public class AddTaskActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_task);
         autoEtSubj =findViewById(R.id.autoEtSubj);
-        initAutoEtSubjects();
+        initAutoEtSubjects();//دالة لاستخراج القيم وعرضها بالحقل السابق
         etShortTitle=findViewById(R.id.etShortTitle);
         etText=findViewById(R.id.etText);
         sbImportance=findViewById(R.id.skbrImportance);
@@ -44,20 +44,23 @@ public class AddTaskActivity extends AppCompatActivity {
     }
 
     /**
-     * استخراج اسماء المواضيع من جدول المواضيع واعرضه بال "سبنر"
+     * استخراج اسماء المواضيع من جدول المواضيع وعرضه بالحقل من نوع
+     * AutoCompleteTextView
+     * طريقة التعامل معه شبيه بال"سبنر"
      */
     private void initAutoEtSubjects() {
+        //مؤشر لقعادة الباينات
         AppDataBase db=AppDataBase.getDB(getApplicationContext());
+        //مؤشر لواجهة استعملامات جدول المواضيع
         MySubjectQuery subjectQuery = db.getMySubjectQuery();
+        //ااستخراج جميع المواضيع من الجدول
         List<MySubject> allSubjects = subjectQuery.getAllSubjects();
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+        //تجهيز الوسيط
+        ArrayAdapter<MySubject> adapter = new ArrayAdapter<MySubject>(this,
                 android.R.layout.simple_dropdown_item_1line);
-        for (MySubject subject : allSubjects) {
-            adapter.add(subject.title);
-        }
-
-        autoEtSubj.setAdapter(adapter);
+        adapter.addAll(allSubjects);//اضافة جميع المعطيات للوسيط
+        autoEtSubj.setAdapter(adapter);//ربط الحقل بالوسيط
+        //معالجة حدث لعرض المواضيع عند الضغط على الحقل
         autoEtSubj.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -78,22 +81,22 @@ public class AddTaskActivity extends AppCompatActivity {
         {
             AppDataBase db=AppDataBase.getDB(getApplicationContext());
             MySubjectQuery subjectQuery = db.getMySubjectQuery();
-            if(subjectQuery.checkSubject(subjText)==null)
-            {
+            if(subjectQuery.checkSubject(subjText)==null)//فحص هل الموضوع موجود من قبل بالجدول
+            {   //بناء موضوع جديد واضافته
                 MySubject subject=new MySubject();
                 subject.title=subjText;
                 subjectQuery.insert(subject);
             }
+            //استخراج الموضوع لاننا بحاجة لرقمه التسلسلي id
             MySubject subject = subjectQuery.checkSubject(subjText);
-
+            //بناء مهمة جديدة وتحديد صفاتها
             MyTask task=new MyTask();
             task.importance=importance;
             task.shortTitle=shortTitle;
             task.text=text;
-            task.subjId=subject.getKey_id();
-
-            db.getMyTaskQuery().insertTask(task);
-            finish();
+            task.subjId=subject.getKey_id();//تحديد رقم الموضوع للمهمة
+            db.getMyTaskQuery().insertTask(task);//اضافة المهمة للجدول
+            finish();//اغلاق الشاشة
         }
     }
 
