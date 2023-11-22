@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.PopupMenu;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -44,7 +45,12 @@ public class MainActivity extends AppCompatActivity {
         initSubjectSpnr();
         lstTasks=findViewById(R.id.lstvTasks);
         initAllListView();
-
+        lstTasks.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                showMenu(view);
+            }
+        });
 
 
 
@@ -143,6 +149,25 @@ public class MainActivity extends AppCompatActivity {
         ArrayAdapter<MyTask> taksAdapter=new ArrayAdapter<MyTask>(this, android.R.layout.simple_list_item_1);
         taksAdapter.addAll(allTasks);
         lstTasks.setAdapter(taksAdapter);
+    }
+
+    /**
+     * دالة مساعدة لفتح قائمة تتلقى
+     * بارمترا للكائن الذي سبب فتح القائمة
+     * @param v
+     */
+    public void showMenu(View v)
+    {
+        //بناء قائمة popup menu
+        PopupMenu popup = new PopupMenu(this, v);//v الكائن الذي سبب فتح القائمة
+                      //ملف القائمة
+        popup.inflate(R.menu.popup_menu);
+        popup.show();//فتح وعرض القائمة
+    }
+
+    public void onClick(View v)
+    {
+        showMenu(v);
     }
 
 
