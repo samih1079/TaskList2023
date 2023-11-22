@@ -18,7 +18,7 @@ public interface MyTaskQuery {
      * اعادة جميع معطيات جدول المهمات
      * @return * قائمة من المهمات
      */
-    @Query("SELECT * FROM MyTask")
+    @Query("SELECT * FROM MyTask ORDER BY importance DESC")
     List<MyTask> getAllTasks();
     /**
      * ارجاع المهمات حسب المستعمل واذا انتهت ام لا ومرتبة تنازليا حسب الاهمية
@@ -63,4 +63,12 @@ public interface MyTaskQuery {
     @Query("DELETE FROM MyTask WHERE keyId=:kid")
     void deleteTask(long kid);
 
+    /**
+     * استخراج جميع المهمات التابعة لرقم الموضوع
+     * @param key_id رقم الموضوع
+     * @return
+     */
+    @Query("SELECT * FROM MyTask WHERE subjId=:key_id " +
+            "ORDER BY importance DESC")
+    List<MyTask> getTasksBySubjId(long key_id);
 }

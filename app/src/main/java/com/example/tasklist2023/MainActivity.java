@@ -6,13 +6,17 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.example.tasklist2023.data.AppDataBase;
 import com.example.tasklist2023.data.mySubjectsTable.MySubject;
 import com.example.tasklist2023.data.mySubjectsTable.MySubjectQuery;
+import com.example.tasklist2023.data.mytasksTable.MyTask;
+import com.example.tasklist2023.data.mytasksTable.MyTaskQuery;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.List;
@@ -21,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
     //spnr1 تعريف صفة للكائن المرئي
     private Spinner spnrSubject;
     private FloatingActionButton fabAdd;
+    private ListView lstTasks;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,13 +42,14 @@ public class MainActivity extends AppCompatActivity {
         //spnr2 وضع مؤشر الصفة على الكائن المرئي الموجود بواجهة المستعمل
        spnrSubject = findViewById(R.id.spnrSubject);
         initSubjectSpnr();
+        lstTasks=findViewById(R.id.lstvTasks);
+        initAllListView();
 
 
 
 
-
-        Log.d("SM","onCreate");
-        Toast.makeText(this, "onCreate", Toast.LENGTH_LONG).show();
+//        Log.d("SM","onCreate");
+//        Toast.makeText(this, "onCreate", Toast.LENGTH_LONG).show();
 
 //        //بناء قاعدة بيانات وارجاع مؤشر عليها1
 //        AppDataBase db=AppDataBase.getDB(getApplicationContext());
@@ -67,53 +73,77 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void initSubjectSpnr() {
+    /**
+     * تجهيز قائمة جميع المهمات وعرضها ب ListView
+     */
+    private void initAllListView() {
         AppDataBase db=AppDataBase.getDB(getApplicationContext());
-        MySubjectQuery subjectQuery = db.getMySubjectQuery();
+        MyTaskQuery taskQuery = db.getMyTaskQuery();
 
-        List<MySubject> allSubjects = subjectQuery.getAllSubjects();
+        List<MyTask> allTasks = taskQuery.getAllTasks();
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_dropdown_item_1line);
-        for (MySubject subject : allSubjects) {
-            adapter.add(subject.title);
-        }
-        spnrSubject.setAdapter(adapter);
+        ArrayAdapter<MyTask> tsksAdapter=new ArrayAdapter<MyTask>(this, android.R.layout.simple_list_item_1);
+        tsksAdapter.addAll(allTasks);
+        lstTasks.setAdapter(tsksAdapter);
     }
-
-    @Override
-    protected void onRestart() {
-        super.onRestart();
-        Log.d("SM","onRestart");
-        Toast.makeText(this, "onCreate", Toast.LENGTH_LONG).show();
-
-    }
-
     @Override
     protected void onResume() {
         super.onResume();
-        Log.d("SM","onResume");
-        Toast.makeText(this, "onResume", Toast.LENGTH_LONG).show();
+        initAllListView();
+        initSubjectSpnr();
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        Log.d("SM","onPause");
-        Toast.makeText(this, "onPause", Toast.LENGTH_LONG).show();
+    /**
+     * عملية تجهيز السبنر بالمواضيع
+     */
+    private void initSubjectSpnr() {
+        AppDataBase db = AppDataBase.getDB(getApplicationContext());//قاعدة بناء
+        MySubjectQuery subjectQuery = db.getMySubjectQuery();//عمليات جدول المواضيع
+        List<MySubject> allSubjects = subjectQuery.getAllSubjects();//استخراج جميع المواضيع
+        //تجهيز الوسيط
+        ArrayAdapter<String> subjectAdapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_dropdown_item_1line);//
+        subjectAdapter.add("ALL");//ستظهر اولا بالسبنر تعني عرض جميع المهمات
+        for (MySubject subject : allSubjects) {//اضافة المواضيع للوسيط
+            subjectAdapter.add(subject.title);
+        }
+        spnrSubject.setAdapter(subjectAdapter);//ربط السبنر بالوسيط
+        //معالج حدث لاختيار موضوع بالسبنر
+        spnrSubject.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                //استخراج الموضوع حسب رقمه الترتيبي i
+                String item = subjectAdapter.getItem(i);
+                if(item.equals("ALL"))//هذه يعني عرض جميع المهام
+                    initAllListView();
+                else {
+                    //استخراج كائن الموضوع الذي اخترناه لاستخراج رقمه id
+                    MySubject subject = subjectQuery.checkSubject(item);
+                    //استدعاء العملية التي تجهز القائمة حسب رقم الموضوع id
+                    initListViewBySubjId(subject.getKey_id());
+                }
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+            }
+        });
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        Log.d("SM","onStop");
-        Toast.makeText(this, "onStop", Toast.LENGTH_LONG).show();
+    /**
+     * تجهيز قائمة المهمات حسب رقم الموضوع
+     * @param key_id رقم الموضوع
+     */
+    private void initListViewBySubjId(long key_id)
+    {
+        AppDataBase db=AppDataBase.getDB(getApplicationContext());
+        MyTaskQuery taskQuery = db.getMyTaskQuery();
+                                //يجب اضافة عملية تعيد جميع المهمات حسب رقم الموضوع
+        List<MyTask> allTasks = taskQuery.getTasksBySubjId(key_id);
+
+        ArrayAdapter<MyTask> taksAdapter=new ArrayAdapter<MyTask>(this, android.R.layout.simple_list_item_1);
+        taksAdapter.addAll(allTasks);
+        lstTasks.setAdapter(taksAdapter);
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        Log.d("SM","onDestroy");
-        Toast.makeText(this, "onDestroy", Toast.LENGTH_LONG).show();
-    }
+
 }
