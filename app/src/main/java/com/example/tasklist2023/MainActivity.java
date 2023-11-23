@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -152,7 +153,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     *
      * دالة مساعدة لفتح قائمة تتلقى
      * بارمترا للكائن الذي سبب فتح القائمة
      * @param v
@@ -161,8 +161,27 @@ public class MainActivity extends AppCompatActivity {
     {
         //بناء قائمة popup menu
         PopupMenu popup = new PopupMenu(this, v);//v الكائن الذي سبب فتح القائمة
-                      //ملف القائمة
+                        //ملف القائمة
         popup.inflate(R.menu.popup_menu);
+        //اضافة معالج حدث لاختيار عنصر من القائمة
+        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                if(menuItem.getItemId()==R.id.mnAddTask)
+                {
+                    //هنا نكتب رد الفعل لاختيار هذا العنصر من القائمة
+                }
+                if(menuItem.getItemId()==R.id.mnDelete)
+                {
+
+                }
+                if(menuItem.getItemId()==R.id.mnDelete)
+                {
+
+                }
+                return true;
+            }
+        });
         popup.show();//فتح وعرض القائمة
     }
 
