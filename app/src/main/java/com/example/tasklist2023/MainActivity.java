@@ -152,6 +152,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
+     *
      * دالة مساعدة لفتح قائمة تتلقى
      * بارمترا للكائن الذي سبب فتح القائمة
      * @param v
