@@ -1,10 +1,11 @@
 package com.example.tasklist2023;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -12,7 +13,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.Spinner;
-import android.widget.Toast;
 
 import com.example.tasklist2023.data.AppDataBase;
 import com.example.tasklist2023.data.mySubjectsTable.MySubject;
@@ -46,12 +46,7 @@ public class MainActivity extends AppCompatActivity {
         initSubjectSpnr();
         lstTasks=findViewById(R.id.lstvTasks);
         initAllListView();
-        lstTasks.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                showMenu(view);
-            }
-        });
+
 
 
 
@@ -89,9 +84,15 @@ public class MainActivity extends AppCompatActivity {
 
         List<MyTask> allTasks = taskQuery.getAllTasks();
 
-        ArrayAdapter<MyTask> tsksAdapter=new ArrayAdapter<MyTask>(this, android.R.layout.simple_list_item_1);
-        tsksAdapter.addAll(allTasks);
-        lstTasks.setAdapter(tsksAdapter);
+        ArrayAdapter<MyTask> taksAdapter=new ArrayAdapter<MyTask>(this, android.R.layout.simple_list_item_1);
+        taksAdapter.addAll(allTasks);
+        lstTasks.setAdapter(taksAdapter);
+        lstTasks.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override                                                   //i رقم العنصر الذي سبب الحدث
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                showMenu(view, taksAdapter.getItem(i)); //i رقم العنصر الذي سبب الحدث
+            }
+        });
     }
     @Override
     protected void onResume() {
@@ -156,8 +157,9 @@ public class MainActivity extends AppCompatActivity {
      * دالة مساعدة لفتح قائمة تتلقى
      * بارمترا للكائن الذي سبب فتح القائمة
      * @param v
+     * @param item
      */
-    public void showMenu(View v)
+    public void showMenu(View v, MyTask item)
     {
         //بناء قائمة popup menu
         PopupMenu popup = new PopupMenu(this, v);//v الكائن الذي سبب فتح القائمة
@@ -185,9 +187,43 @@ public class MainActivity extends AppCompatActivity {
         popup.show();//فتح وعرض القائمة
     }
 
-    public void onClick(View v)
+    /**
+     * بناء قائمة التي تفتح من النقاط الثلاثة بزاوية الشاشة
+     * @param menu
+     * @return
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu)
+    {                            //اسم ملف القئمة
+        getMenuInflater().inflate(R.menu.options_menu, menu);
+        return true;
+    }
+
+    /**
+     * معالج حدث اختيار عنصر من عناصر القائمة التس تفتح من النقاط الثلاثة بزاوية الشاشة
+     * @param item العنصر لاذي تم اختياره من القائمة
+     * @return
+     */
+    @Override
+    public boolean onOptionsItemSelected( MenuItem item)
+    {      //فحص العنصر الذي سبب الحدث حسب ال id
+        if(item.getItemId()==R.id.mnSettings)
+        {
+        }
+        if(item.getItemId()==R.id.mnLogout)
+        {
+            showYesNoDialog();
+        }
+        return true;
+    }
+
+    public void showYesNoDialog()
     {
-        showMenu(v);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Title");
+        builder.setMessage("Message");
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 
 
