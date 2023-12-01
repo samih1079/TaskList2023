@@ -3,6 +3,7 @@ package com.example.tasklist2023;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -13,6 +14,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.example.tasklist2023.data.AppDataBase;
 import com.example.tasklist2023.data.mySubjectsTable.MySubject;
@@ -20,6 +22,7 @@ import com.example.tasklist2023.data.mySubjectsTable.MySubjectQuery;
 import com.example.tasklist2023.data.mytasksTable.MyTask;
 import com.example.tasklist2023.data.mytasksTable.MyTaskQuery;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.List;
 
@@ -217,14 +220,44 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    /**
+     * بناء ديالوج
+     */
     public void showYesNoDialog()
     {
+        //تجهيز بنّاء شباك حوار "ديالوغ" يتلقى بارمتر مؤشر للنشاط (اكتيفيتي) الحالي
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Title");
-        builder.setMessage("Message");
-        AlertDialog dialog = builder.create();
-        dialog.show();
+        builder.setTitle("Log out");// تحديد العنوان
+        builder.setMessage("Are you sure?");// تحدي فحوى شباك الحوار
+                               //النض على الزر ومعالج الحدث
+        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                //معالجة خدث للموافقة
+                Toast.makeText(MainActivity.this, "Signing out", Toast.LENGTH_SHORT).show();
+
+                FirebaseAuth.getInstance().signOut();
+
+                finish();
+            }
+        });
+                                    //النض على الزر ومعالج الحدث
+        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                //معالجة خدث للموافقة
+                Toast.makeText(MainActivity.this, "Signing out", Toast.LENGTH_SHORT).show();
+            }
+        });
+        AlertDialog dialog = builder.create();//بناء شباك الحوار -ديالوغ
+        dialog.show();//عرض الشباك
     }
+
+
+
+
+
+
 
 
 }
