@@ -100,4 +100,29 @@ public class AddTaskActivity extends AppCompatActivity {
         }
     }
 
+    private void checkAndSaveTask_FB()
+    {
+        boolean isAllOK=true;
+        String subjText=autoEtSubj.getText().toString();
+        String shortTitle=etShortTitle.getText().toString();
+        String text=etText.getText().toString();
+        int importance=sbImportance.getProgress();
+
+        if(isAllOK)
+        {
+               //بناء موضوع جديد واضافته
+                MySubject subject=new MySubject();
+                subject.title=subjText;
+
+            //بناء مهمة جديدة وتحديد صفاتها
+            MyTask task=new MyTask();
+            task.importance=importance;
+            task.shortTitle=shortTitle;
+            task.text=text;
+            task.subjId=subject.getKey_id();//تحديد رقم الموضوع للمهمة
+
+            finish();//اغلاق الشاشة
+        }
+    }
+
 }

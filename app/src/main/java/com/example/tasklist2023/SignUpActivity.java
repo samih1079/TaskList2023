@@ -12,10 +12,13 @@ import com.example.tasklist2023.data.AppDataBase;
 import com.example.tasklist2023.data.usersTable.MyUser;
 import com.example.tasklist2023.data.usersTable.MyUserQuery;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class SignUpActivity extends AppCompatActivity {
     private Button btnSave, btnCancel;
@@ -129,6 +132,7 @@ public class SignUpActivity extends AppCompatActivity {
                 public void onComplete(@NonNull Task<AuthResult> task) {// הפרמטר מכיל מידע מהשרת על תוצאת הבקשה לרישום
                     if (task.isComplete()) {// אם הפעולה הצליחה
                         Toast.makeText(SignUpActivity.this, "Signing up Succeeded", Toast.LENGTH_SHORT).show();
+                        saveUser(email,password,name,phone);
                         finish();
                     } else {
                         Toast.makeText(SignUpActivity.this, "Signing up Failed", Toast.LENGTH_SHORT).show();
@@ -138,6 +142,33 @@ public class SignUpActivity extends AppCompatActivity {
                 }
             });
         }
+
+    }
+
+    private void saveUser(String email, String name, String phone, String passw) {
+        MyUser user=new MyUser();
+        user.setEmail(email);
+        user.setFullName(name);
+        user.setPhone(phone);
+        user.setPassw(passw);
+        //مؤشر لقاعدة البيانات
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        //اضافة كائن "لمجموعة" المستعملين ومعالج حدث لفحص نجاح الاضافة
+        db.collection("MyUsers").add(user).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentReference> task) {
+                if(task.isSuccessful())
+                {
+                    Toast.makeText(SignUpActivity.this, "Succeeded to add User", Toast.LENGTH_SHORT).show();
+                    finish();
+                }
+                else
+                {
+                    Toast.makeText(SignUpActivity.this, "Failed to add User", Toast.LENGTH_SHORT).show();
+                    etEmail.setError(task.getException().getMessage());
+                }
+            }
+        });
 
     }
 
