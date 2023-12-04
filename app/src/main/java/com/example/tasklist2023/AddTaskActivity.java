@@ -68,7 +68,7 @@ public class AddTaskActivity extends AppCompatActivity {
             }
         });
     }
-
+///khkjhj
     private void checkAndSaveTask()
     {
         boolean isAllOK=true;
