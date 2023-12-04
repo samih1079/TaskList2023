@@ -44,7 +44,7 @@ public class SignInActivity extends AppCompatActivity {
      * @param v
      */
     public void onClickSignIn(View v) {
-
+        checkEmailPassw_FB();
         checkEmailPassw();//دالة لاستخراج وفحص فحوى حقول المُدخلة
     }
 
