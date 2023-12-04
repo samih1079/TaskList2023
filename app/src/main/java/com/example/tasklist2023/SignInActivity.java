@@ -45,7 +45,7 @@ public class SignInActivity extends AppCompatActivity {
      */
     public void onClickSignIn(View v) {
         checkEmailPassw_FB();
-        checkEmailPassw();//دالة لاستخراج وفحص فحوى حقول المُدخلة
+        //checkEmailPassw();//دالة لاستخراج وفحص فحوى حقول المُدخلة
     }
 
     private void checkEmailPassw() {
@@ -112,7 +112,7 @@ public class SignInActivity extends AppCompatActivity {
             auth.signInWithEmailAndPassword(email,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                 @Override //התגובה שמתקבל מהענן מניסיון הכניסה בענן
                 public void onComplete(@NonNull Task<AuthResult> task) {// הפרמטר מכיל מידע מהשרת על תוצאת הבקשה לרישום
-                    if(task.isComplete()){// אם הפעולה הצליחה
+                    if(task.isSuccessful()){// אם הפעולה הצליחה
                         Toast.makeText(SignInActivity.this, "Signing in Succeeded", Toast.LENGTH_SHORT).show();
                         //מעבר למסך הראשי
                         Intent i=new Intent(SignInActivity.this,MainActivity.class);

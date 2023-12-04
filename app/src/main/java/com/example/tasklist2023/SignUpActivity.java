@@ -35,14 +35,14 @@ public class SignUpActivity extends AppCompatActivity {
         etPassword = findViewById(R.id.etPassword);
         etRePassword = findViewById(R.id.etRePassword);
         etPhone = findViewById(R.id.etPhone);
-        etName = findViewById(R.id.etEmail);
+        etName = findViewById(R.id.etFullName);
 
     }
 
     public void onClick(View v) {
         if (v == btnSave) {
             checkAndSignUP_FB();
-            checkAndSave();
+            // checkAndSave();
         }
         if (v == btnCancel) {
             finish();
@@ -131,7 +131,7 @@ public class SignUpActivity extends AppCompatActivity {
             auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                 @Override//התגובה שמתקבל הניסיון הרישום בענן
                 public void onComplete(@NonNull Task<AuthResult> task) {// הפרמטר מכיל מידע מהשרת על תוצאת הבקשה לרישום
-                    if (task.isComplete()) {// אם הפעולה הצליחה
+                    if (task.isSuccessful()) {// אם הפעולה הצליחה
                         Toast.makeText(SignUpActivity.this, "Signing up Succeeded", Toast.LENGTH_SHORT).show();
                         saveUser(email,password,name,phone);
                         finish();
@@ -147,26 +147,29 @@ public class SignUpActivity extends AppCompatActivity {
     }
 
     private void saveUser(String email, String name, String phone, String passw) {
+
+        //مؤشر لقاعدة البيانات
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
         MyUser user=new MyUser();
         user.setEmail(email);
         user.setFullName(name);
         user.setPhone(phone);
         user.setPassw(passw);
-        //مؤشر لقاعدة البيانات
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        user.setId(uid);
         //اضافة كائن "لمجموعة" المستعملين ومعالج حدث لفحص نجاح الاضافة
-        db.collection("MyUsers").add(user).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+        db.collection("MyUsers").document(uid).set(user).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
-            public void onComplete(@NonNull Task<DocumentReference> task) {
-                if(task.isSuccessful())
-                {
+            public void onComplete(@NonNull Task<Void> task) {
+                if(task.isSuccessful()) {
                     Toast.makeText(SignUpActivity.this, "Succeeded to add User", Toast.LENGTH_SHORT).show();
                     finish();
                 }
                 else
                 {
                     Toast.makeText(SignUpActivity.this, "Failed to add User", Toast.LENGTH_SHORT).show();
-                    etEmail.setError(task.getException().getMessage());
+
                 }
             }
         });
