@@ -179,11 +179,14 @@ public class MainActivity extends AppCompatActivity {
                 }
                 if(menuItem.getItemId()==R.id.mnDelete)
                 {
-                    AppDataBase.getDB(MainActivity.this).getMyTaskQuery().deleteTask(item.keyId);
+                    AppDataBase db = AppDataBase.getDB(MainActivity.this);
+                    MyTaskQuery myTaskQuery = db.getMyTaskQuery();
+                    myTaskQuery.deleteTask(item.keyId);
+
                     initAllListView();
                     initSubjectSpnr();
                 }
-                if(menuItem.getItemId()==R.id.mnDelete)
+                if(menuItem.getItemId()==R.id.mnEdit)
                 {
 
                 }

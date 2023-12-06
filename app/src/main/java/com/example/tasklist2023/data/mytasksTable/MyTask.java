@@ -8,6 +8,8 @@ import androidx.room.PrimaryKey;
 @Entity
 public class MyTask
 {
+    public String id;
+    public String sbjId;
     @PrimaryKey(autoGenerate = true)
     /** رقم المهمة */
     public long keyId;

@@ -7,6 +7,8 @@ import androidx.room.PrimaryKey;
 @Entity
 public class MySubject
 {
+    public String id;
+    public String userId;
     @PrimaryKey(autoGenerate = true)
     public long key_id;
     public String title;
