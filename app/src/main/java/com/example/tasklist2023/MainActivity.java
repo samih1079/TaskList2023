@@ -93,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
         lstTasks.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override                                                   //i رقم العنصر الذي سبب الحدث
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                showMenu(view, taksAdapter.getItem(i)); //i رقم العنصر الذي سبب الحدث
+                showPopUpMenu(view, taksAdapter.getItem(i)); //i رقم العنصر الذي سبب الحدث
             }
         });
     }
@@ -162,7 +162,7 @@ public class MainActivity extends AppCompatActivity {
      * @param v
      * @param item
      */
-    public void showMenu(View v, MyTask item)
+    public void showPopUpMenu(View v, MyTask item)
     {
         //بناء قائمة popup menu
         PopupMenu popup = new PopupMenu(this, v);//v الكائن الذي سبب فتح القائمة
@@ -175,10 +175,13 @@ public class MainActivity extends AppCompatActivity {
                 if(menuItem.getItemId()==R.id.mnAddTask)
                 {
                     //هنا نكتب رد الفعل لاختيار هذا العنصر من القائمة
+
                 }
                 if(menuItem.getItemId()==R.id.mnDelete)
                 {
-
+                    AppDataBase.getDB(MainActivity.this).getMyTaskQuery().deleteTask(item.keyId);
+                    initAllListView();
+                    initSubjectSpnr();
                 }
                 if(menuItem.getItemId()==R.id.mnDelete)
                 {

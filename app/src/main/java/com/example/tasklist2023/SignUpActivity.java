@@ -41,8 +41,8 @@ public class SignUpActivity extends AppCompatActivity {
 
     public void onClick(View v) {
         if (v == btnSave) {
-            checkAndSignUP_FB();
-            // checkAndSave();
+           //checkAndSignUP_FB();
+             checkAndSave();
         }
         if (v == btnCancel) {
             finish();
