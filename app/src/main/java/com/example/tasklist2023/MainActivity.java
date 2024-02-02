@@ -58,9 +58,9 @@ public class MainActivity extends AppCompatActivity {
         });
         //spnr2 وضع مؤشر الصفة على الكائن المرئي الموجود بواجهة المستعمل
        spnrSubject = findViewById(R.id.spnrSubject);
-        initSubjectSpnr();
+        initSubjectSpnr_FB();
         lstTasks=findViewById(R.id.lstvTasks);
-        initAllListView();
+        //initAllListView_FB();
 
 
 
@@ -92,10 +92,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        //initAllListView();
-        initAllListView_FB();
+
         //initSubjectSpnr();
         initSubjectSpnr_FB();
+        //initAllListView();
+   //     initAllListView_FB();
     }
 
     /**
@@ -121,21 +122,23 @@ public class MainActivity extends AppCompatActivity {
      * تجهيز قائمة جميع المهمات وعرضها ب ListView
      */
     private void initAllListView_FB() {
+        ArrayAdapter<MyTask> tasksAdapter=new ArrayAdapter<MyTask>(this, android.R.layout.simple_list_item_1);
+        lstTasks.setAdapter(tasksAdapter);
         FirebaseFirestore ffRef = FirebaseFirestore.getInstance();
-        CollectionReference myUsers = ffRef.collection("MyUsers");
-        DocumentReference document = myUsers.document(FirebaseAuth.getInstance().getUid());
-        document.collection("subjects").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                List<DocumentSnapshot> documents = task.getResult().getDocuments();
-                for (DocumentSnapshot doc : documents) {
-                    MySubject mySubject = doc.toObject(MySubject.class);
+        ffRef.collection("MyUsers").
+                document(FirebaseAuth.getInstance().getUid()).
+                collection("subjects").
+                document(spnrSubject.getSelectedItem().toString()).
+                collection("Tasks").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        for (DocumentSnapshot document : task.getResult().getDocuments()) {
+                            tasksAdapter.add(document.toObject(MyTask.class));
+                        }
+                    }
+                });
 
-                }
-            }
-        });
 
-/
 //        ArrayAdapter<MyTask> taksAdapter=new ArrayAdapter<MyTask>(this, android.R.layout.simple_list_item_1);
 //        taksAdapter.addAll(allTasks);
 //        lstTasks.setAdapter(taksAdapter);
@@ -198,36 +201,33 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 subjectAdapter.clear();
-                subjectAdapter.add("ALL");//ستظهر اولا بالسبنر تعني عرض جميع المهمات
+              //  subjectAdapter.add("ALL");//ستظهر اولا بالسبنر تعني عرض جميع المهمات
                 List<DocumentSnapshot> documents = task.getResult().getDocuments();
-                for (DocumentSnapshot doc : documents) {
+                for (DocumentSnapshot doc : documents) {//اضافة المواضيع للوسيط
                     MySubject mySubject = doc.toObject(MySubject.class);
                     subjectAdapter.add(mySubject.getTitle());
                 }
+                spnrSubject.setAdapter(subjectAdapter);//ربط السبنر بالوسيط
+
             }
         });
 
-        //تجهيز الوسيط
 
-        subjectAdapter.add("ALL");//ستظهر اولا بالسبنر تعني عرض جميع المهمات
-        for (MySubject subject : allSubjects) {//اضافة المواضيع للوسيط
-            subjectAdapter.add(subject.title);
-        }
-        spnrSubject.setAdapter(subjectAdapter);//ربط السبنر بالوسيط
         //معالج حدث لاختيار موضوع بالسبنر
         spnrSubject.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                //استخراج الموضوع حسب رقمه الترتيبي i
-                String item = subjectAdapter.getItem(i);
-                if(item.equals("ALL"))//هذه يعني عرض جميع المهام
-                    initAllListView();
-                else {
-                    //استخراج كائن الموضوع الذي اخترناه لاستخراج رقمه id
-                    MySubject subject = subjectQuery.checkSubject(item);
-                    //استدعاء العملية التي تجهز القائمة حسب رقم الموضوع id
-                    initListViewBySubjId(subject.getKey_id());
-                }
+                initAllListView_FB();
+//                //استخراج الموضوع حسب رقمه الترتيبي i
+//                String item = subjectAdapter.getItem(i);
+//                if(item.equals("ALL"))//هذه يعني عرض جميع المهام
+//                    initAllListView();
+//                else {
+//                    //استخراج كائن الموضوع الذي اخترناه لاستخراج رقمه id
+//                    MySubject subject = subjectQuery.checkSubject(item);
+//                    //استدعاء العملية التي تجهز القائمة حسب رقم الموضوع id
+//                    initListViewBySubjId(subject.getKey_id());
+//                }
             }
             @Override
             public void onNothingSelected(AdapterView<?> adapterView) {
@@ -269,20 +269,21 @@ public class MainActivity extends AppCompatActivity {
                 if(menuItem.getItemId()==R.id.mnAddTask)
                 {
                     //هنا نكتب رد الفعل لاختيار هذا العنصر من القائمة
+                    Toast.makeText(MainActivity.this, "To Add", Toast.LENGTH_SHORT).show();
 
                 }
                 if(menuItem.getItemId()==R.id.mnDelete)
                 {
-                    AppDataBase db = AppDataBase.getDB(MainActivity.this);
-                    MyTaskQuery myTaskQuery = db.getMyTaskQuery();
-                    myTaskQuery.deleteTask(item.keyId);
-
-                    initAllListView();
-                    initSubjectSpnr();
+//                    AppDataBase db = AppDataBase.getDB(MainActivity.this);
+//                    MyTaskQuery myTaskQuery = db.getMyTaskQuery();
+//                    myTaskQuery.deleteTask(item.keyId);
+                    Toast.makeText(MainActivity.this, "To del (isn't completed)", Toast.LENGTH_SHORT).show();
+//                    initAllListView();
+//                    initSubjectSpnr();
                 }
                 if(menuItem.getItemId()==R.id.mnEdit)
                 {
-
+                    Toast.makeText(MainActivity.this, "To Edit", Toast.LENGTH_SHORT).show();
                 }
                 return true;
             }
