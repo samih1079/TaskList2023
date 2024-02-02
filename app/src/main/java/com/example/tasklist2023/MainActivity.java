@@ -1,5 +1,7 @@
 package com.example.tasklist2023;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -21,8 +23,18 @@ import com.example.tasklist2023.data.mySubjectsTable.MySubject;
 import com.example.tasklist2023.data.mySubjectsTable.MySubjectQuery;
 import com.example.tasklist2023.data.mytasksTable.MyTask;
 import com.example.tasklist2023.data.mytasksTable.MyTaskQuery;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.List;
 
@@ -77,6 +89,14 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        //initAllListView();
+        initAllListView_FB();
+        //initSubjectSpnr();
+        initSubjectSpnr_FB();
+    }
 
     /**
      * تجهيز قائمة جميع المهمات وعرضها ب ListView
@@ -97,11 +117,34 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-    @Override
-    protected void onResume() {
-        super.onResume();
-        initAllListView();
-        initSubjectSpnr();
+    /**
+     * تجهيز قائمة جميع المهمات وعرضها ب ListView
+     */
+    private void initAllListView_FB() {
+        FirebaseFirestore ffRef = FirebaseFirestore.getInstance();
+        CollectionReference myUsers = ffRef.collection("MyUsers");
+        DocumentReference document = myUsers.document(FirebaseAuth.getInstance().getUid());
+        document.collection("subjects").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                List<DocumentSnapshot> documents = task.getResult().getDocuments();
+                for (DocumentSnapshot doc : documents) {
+                    MySubject mySubject = doc.toObject(MySubject.class);
+
+                }
+            }
+        });
+
+/
+//        ArrayAdapter<MyTask> taksAdapter=new ArrayAdapter<MyTask>(this, android.R.layout.simple_list_item_1);
+//        taksAdapter.addAll(allTasks);
+//        lstTasks.setAdapter(taksAdapter);
+//        lstTasks.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override                                                   //i رقم العنصر الذي سبب الحدث
+//            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+//                showPopUpMenu(view, taksAdapter.getItem(i)); //i رقم العنصر الذي سبب الحدث
+//            }
+//        });
     }
 
     /**
@@ -139,7 +182,58 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+    /**
+     * عملية تجهيز السبنر بالمواضيع
+     */
+    private void initSubjectSpnr_FB() {
+//        AppDataBase db = AppDataBase.getDB(getApplicationContext());//قاعدة بناء
+//        MySubjectQuery subjectQuery = db.getMySubjectQuery();//عمليات جدول المواضيع
+//        List<MySubject> allSubjects = subjectQuery.getAllSubjects();//استخراج جميع المواضيع
+        ArrayAdapter<String> subjectAdapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_dropdown_item_1line);//
+        FirebaseFirestore ffRef = FirebaseFirestore.getInstance();
+        CollectionReference myUsers = ffRef.collection("MyUsers");
+        DocumentReference document = myUsers.document(FirebaseAuth.getInstance().getUid());
+        document.collection("subjects").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                subjectAdapter.clear();
+                subjectAdapter.add("ALL");//ستظهر اولا بالسبنر تعني عرض جميع المهمات
+                List<DocumentSnapshot> documents = task.getResult().getDocuments();
+                for (DocumentSnapshot doc : documents) {
+                    MySubject mySubject = doc.toObject(MySubject.class);
+                    subjectAdapter.add(mySubject.getTitle());
+                }
+            }
+        });
 
+        //تجهيز الوسيط
+
+        subjectAdapter.add("ALL");//ستظهر اولا بالسبنر تعني عرض جميع المهمات
+        for (MySubject subject : allSubjects) {//اضافة المواضيع للوسيط
+            subjectAdapter.add(subject.title);
+        }
+        spnrSubject.setAdapter(subjectAdapter);//ربط السبنر بالوسيط
+        //معالج حدث لاختيار موضوع بالسبنر
+        spnrSubject.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                //استخراج الموضوع حسب رقمه الترتيبي i
+                String item = subjectAdapter.getItem(i);
+                if(item.equals("ALL"))//هذه يعني عرض جميع المهام
+                    initAllListView();
+                else {
+                    //استخراج كائن الموضوع الذي اخترناه لاستخراج رقمه id
+                    MySubject subject = subjectQuery.checkSubject(item);
+                    //استدعاء العملية التي تجهز القائمة حسب رقم الموضوع id
+                    initListViewBySubjId(subject.getKey_id());
+                }
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+            }
+        });
+    }
     /**
      * تجهيز قائمة المهمات حسب رقم الموضوع
      * @param key_id رقم الموضوع

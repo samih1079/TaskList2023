@@ -46,7 +46,7 @@ public class AddTaskActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 checkAndSaveTask_FB();
-                checkAndSaveTask();
+               // checkAndSaveTask();
             }
         });
     }
@@ -76,6 +76,7 @@ public class AddTaskActivity extends AppCompatActivity {
             }
         });
     }
+
 ///khkjhj
     private void checkAndSaveTask()
     {

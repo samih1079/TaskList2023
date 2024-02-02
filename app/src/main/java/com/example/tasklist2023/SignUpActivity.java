@@ -12,12 +12,10 @@ import com.example.tasklist2023.data.AppDataBase;
 import com.example.tasklist2023.data.usersTable.MyUser;
 import com.example.tasklist2023.data.usersTable.MyUserQuery;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 public class SignUpActivity extends AppCompatActivity {
@@ -41,8 +39,8 @@ public class SignUpActivity extends AppCompatActivity {
 
     public void onClick(View v) {
         if (v == btnSave) {
-           //checkAndSignUP_FB();
-             checkAndSave();
+           checkAndSignUP_FB();
+             //checkAndSave();
         }
         if (v == btnCancel) {
             finish();
@@ -133,7 +131,7 @@ public class SignUpActivity extends AppCompatActivity {
                 public void onComplete(@NonNull Task<AuthResult> task) {// הפרמטר מכיל מידע מהשרת על תוצאת הבקשה לרישום
                     if (task.isSuccessful()) {// אם הפעולה הצליחה
                         Toast.makeText(SignUpActivity.this, "Signing up Succeeded", Toast.LENGTH_SHORT).show();
-                        saveUser(email,password,name,phone);
+                        saveUser_FB(email,password,name,phone);
                         finish();
                     } else {
                         Toast.makeText(SignUpActivity.this, "Signing up Failed", Toast.LENGTH_SHORT).show();
@@ -146,7 +144,7 @@ public class SignUpActivity extends AppCompatActivity {
 
     }
 
-    private void saveUser(String email, String name, String phone, String passw) {
+    private void saveUser_FB(String email, String name, String phone, String passw) {
 
         //مؤشر لقاعدة البيانات
         FirebaseFirestore db = FirebaseFirestore.getInstance();
