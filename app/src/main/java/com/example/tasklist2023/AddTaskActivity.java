@@ -119,47 +119,62 @@ public class AddTaskActivity extends AppCompatActivity {
 
         if(isAllOK)
         {
+            //קבלת הפניה למסד הניתונים
             FirebaseFirestore db=FirebaseFirestore.getInstance();
+            //קבלת מזהה המשתמש שנכנס לאפליקציה
             String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-
+            //קבלת קישור לאוסף המקצועות שנמצא במסמך המשתמש-לפי המזהה שלו-
             CollectionReference subjCollection = db.collection("MyUsers")
                     .document(uid)
                     .collection("subjects");
+            //  לקבל מזהה ייחודי למסמך החדש
             String sbjId = subjCollection.document().getId();
-            //بناء موضوع جديد واضافته
+            //בניית עצם מקצוע עם מזהה של המשתמש שיצר אותו
                 MySubject subject=new MySubject();
                 subject.title=subjText;
                 subject.id=sbjId;
                 subject.userId=uid;
 
-            //بناء مهمة جديدة وتحديد صفاتها
+            //בניית עצם למשימה
             MyTask myTask=new MyTask();
             myTask.importance=importance;
             myTask.shortTitle=shortTitle;
             myTask.text=text;
-            myTask.subjId=subject.getKey_id();//تحديد رقم الموضوع للمهمة
-
+            myTask.subjId=subject.getKey_id();//קביעת מזהה המקצוע ששיכת לו המשימה
+            //הוספת מקצוע לאוסף המקצועות (מזהה המקצוע הוא השם שלו)
+                                                            //הוספת מאזין שבודק אם ההוספה הצליחה
             subjCollection.document(subjText).set(subject).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
                     if(task.isSuccessful())
                     {
+                        //אם ההוספה של המקצוע הצליחה מוסיפים משימה למקצוע
+                        //קבלת קישור/כתובת לאוסף המשימות
                         CollectionReference tasksCollection = subjCollection.document(subjText).collection("Tasks");
+                        // קבלת מזהה למסמך החדש
                         String taskId = tasksCollection.document().getId();
-                        myTask.id=taskId;
-                        myTask.sbjId=sbjId;
-
+                        myTask.id=taskId;//עידכון תכונת המזהה של המשימה
+                        // הוספת (מסמך) המשימה לאוסף המשימות
+                                                                    //הוספת המאזין לבדיקת הצלחת ההוספה
                         tasksCollection.document(taskId).set(myTask).addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
                                 if(task.isSuccessful())
                                 {
-                                    Toast.makeText(AddTaskActivity.this, "Taskk Add FB", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(AddTaskActivity.this, "Adding myTask Succeeded", Toast.LENGTH_SHORT).show();
                                     finish();;
+                                }
+                                else
+                                {
+                                    Toast.makeText(AddTaskActivity.this, "Adding myTask failed"+task.getException().toString(), Toast.LENGTH_SHORT).show();
+
                                 }
                             }
                         });
-
+                    }
+                    else
+                    {
+                        Toast.makeText(AddTaskActivity.this, "Adding mySubject failed"+task.getException().toString(), Toast.LENGTH_SHORT).show();
 
                     }
                 }
