@@ -31,6 +31,7 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -61,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
         initSubjectSpnr_FB();
         lstTasks=findViewById(R.id.lstvTasks);
         //initAllListView_FB();
-
+        realTimeUpdate_subjects();
 
 
 
@@ -125,6 +126,8 @@ public class MainActivity extends AppCompatActivity {
         ArrayAdapter<MyTask> tasksAdapter=new ArrayAdapter<MyTask>(this, android.R.layout.simple_list_item_1);
         lstTasks.setAdapter(tasksAdapter);
         FirebaseFirestore ffRef = FirebaseFirestore.getInstance();
+        if(spnrSubject==null || spnrSubject.getSelectedItem()==null)
+            return;
         ffRef.collection("MyUsers").
                 document(FirebaseAuth.getInstance().getUid()).
                 collection("subjects").
@@ -138,18 +141,43 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
-
 //        ArrayAdapter<MyTask> taksAdapter=new ArrayAdapter<MyTask>(this, android.R.layout.simple_list_item_1);
 //        taksAdapter.addAll(allTasks);
 //        lstTasks.setAdapter(taksAdapter);
-//        lstTasks.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override                                                   //i رقم العنصر الذي سبب الحدث
-//            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-//                showPopUpMenu(view, taksAdapter.getItem(i)); //i رقم العنصر الذي سبب الحدث
-//            }
-//        });
+        lstTasks.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override                                                   //i رقم العنصر الذي سبب الحدث
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                showPopUpMenu(view, tasksAdapter.getItem(i)); //i رقم العنصر الذي سبب الحدث
+            }
+        });
     }
 
+    private void realTimeUpdate_subjects()
+    {
+        FirebaseFirestore ffRef = FirebaseFirestore.getInstance();
+        ffRef.collection("MyUsers").
+                document(FirebaseAuth.getInstance().getUid()).
+                collection("subjects")
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                        initSubjectSpnr_FB();
+                    }
+                });
+    }
+    private void realTimeUpdate_tasks()
+    {
+        FirebaseFirestore ffRef = FirebaseFirestore.getInstance();
+        ffRef.collection("MyUsers").
+                document(FirebaseAuth.getInstance().getUid()).
+                collection("subjects")
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                        initSubjectSpnr_FB();
+                    }
+                });
+    }
     /**
      * عملية تجهيز السبنر بالمواضيع
      */
@@ -208,6 +236,7 @@ public class MainActivity extends AppCompatActivity {
                     subjectAdapter.add(mySubject.getTitle());
                 }
                 spnrSubject.setAdapter(subjectAdapter);//ربط السبنر بالوسيط
+                initAllListView_FB();
 
             }
         });
@@ -280,6 +309,24 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(MainActivity.this, "To del (isn't completed)", Toast.LENGTH_SHORT).show();
 //                    initAllListView();
 //                    initSubjectSpnr();
+                     FirebaseFirestore db=FirebaseFirestore.getInstance();
+                    db.collection("MyUsers").
+                            document(FirebaseAuth.getInstance().getUid()).
+                            collection("subjects").
+                            document(spnrSubject.getSelectedItem().toString()).
+                            collection("Tasks").document(item.id).
+                            delete().
+                            addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if(task.isSuccessful())
+                                    {
+                                        initAllListView_FB();
+                                        Toast.makeText(MainActivity.this, "deleted", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            });
+                            
                 }
                 if(menuItem.getItemId()==R.id.mnEdit)
                 {
