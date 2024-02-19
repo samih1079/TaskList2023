@@ -3,6 +3,10 @@ package com.example.tasklist2023;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.ProgressDialog;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -16,19 +20,32 @@ import com.example.tasklist2023.data.mySubjectsTable.MySubject;
 import com.example.tasklist2023.data.mySubjectsTable.MySubjectQuery;
 import com.example.tasklist2023.data.mytasksTable.MyTask;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.OnProgressListener;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.StorageTask;
+import com.google.firebase.storage.UploadTask;
 
 import java.util.List;
+import java.util.UUID;
 
 public class AddTaskActivity extends AppCompatActivity {
     private Button btnSave,btnCancel;
     private SeekBar sbImportance;
     private TextInputEditText etShortTitle, etText;
     private AutoCompleteTextView autoEtSubj;
+    private Uri downladuri;
+    private int IMAGE_PICK_CODE=100;
+    private int PERMISSION_CODE=101;
+    private Uri toUploadimageUri;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -184,4 +201,85 @@ public class AddTaskActivity extends AppCompatActivity {
         }
     }
 
+    //upload: 5
+    private void uploadImage(Uri filePath) {
+
+        if(filePath != null)
+        {
+            final ProgressDialog progressDialog = new ProgressDialog(this);
+            progressDialog.setTitle("Uploading...");
+            progressDialog.show();
+            FirebaseStorage storage= FirebaseStorage.getInstance();
+            StorageReference storageReference = storage.getReference();
+            final StorageReference ref = storageReference.child("images/"+ UUID.randomUUID().toString());
+            StorageTask<UploadTask.TaskSnapshot> uploadTask = ref.putFile(filePath)
+                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            progressDialog.dismiss();
+                            ref.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Uri> task) {
+                                    downladuri = task.getResult();
+                                   // t.setImage(downladuri.toString());
+
+                                }
+                            });
+
+                            Toast.makeText(getApplicationContext(), "Uploaded", Toast.LENGTH_SHORT).show();
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            progressDialog.dismiss();
+                            Toast.makeText(getApplicationContext(), "Failed " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    })
+                    .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+                            double progress = (100.0 * taskSnapshot.getBytesTransferred() / taskSnapshot
+                                    .getTotalByteCount());
+                            progressDialog.setMessage("Uploaded " + (int) progress + "%");
+                        }
+                    });
+        }else
+        {
+
+        }
+    }
+    private void pickImageFromGallery(){
+        //intent to pick image
+        Intent intent=new Intent(Intent.ACTION_PICK);
+        intent.setType("image/*");
+        startActivityForResult(intent,IMAGE_PICK_CODE);
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults){
+        switch (requestCode){
+            case PERMISSION_CODE:{
+                if(grantResults.length>0 && grantResults[0]== PackageManager.PERMISSION_GRANTED){
+                    //permission was granted
+                    pickImageFromGallery();
+                }
+                else {
+                    //permission was denied
+                    Toast.makeText(this,"Permission denied...!",Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
+    }
+
+    //handle result of picked images
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data){
+        super.onActivityResult(requestCode,resultCode,data);
+        if (resultCode==RESULT_OK && requestCode== IMAGE_PICK_CODE){
+            //set image to image view
+            toUploadimageUri = data.getData();
+           // imgBtnl.setImageURI(toUploadimageUri);
+        }
+    }
 }

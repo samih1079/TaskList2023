@@ -7,12 +7,17 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.Spinner;
@@ -24,6 +29,8 @@ import com.example.tasklist2023.data.mySubjectsTable.MySubjectQuery;
 import com.example.tasklist2023.data.mytasksTable.MyTask;
 import com.example.tasklist2023.data.mytasksTable.MyTaskQuery;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
@@ -31,12 +38,15 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
-import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.storage.FileDownloadTask;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -403,7 +413,89 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+    private void downloadImageUsingPicasso(String imageUrL, ImageView toView)
+    {
+//        Picasso.with(getContext())
+//                .load(imageUrL)
+//                .centerCrop()
+//                .error(R.drawable.common_full_open_on_phone)
+//                .resize(90,90)
+//                .into(toView);
+    }
 
+    private void downloadImageToLocalFile(String fileURL, final ImageView toView) {
+        StorageReference httpsReference = FirebaseStorage.getInstance().getReferenceFromUrl(fileURL);
+        final File localFile;
+        try {
+            localFile = File.createTempFile("images", "jpg");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+
+        httpsReference.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                // Local temp file has been created
+                Toast.makeText(getApplicationContext(), "downloaded Image To Local File", Toast.LENGTH_SHORT).show();
+                toView.setImageURI(Uri.fromFile(localFile));
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                // Handle any errors
+                Toast.makeText(getApplicationContext(), "onFailure downloaded Image To Local File "+exception.getMessage(), Toast.LENGTH_SHORT).show();
+                exception.printStackTrace();
+            }
+        });
+    }
+    private void downloadImageToMemory(String fileURL, final ImageView toView)
+    {
+        StorageReference httpsReference = FirebaseStorage.getInstance().getReferenceFromUrl(fileURL);
+        final long ONE_MEGABYTE = 1024 * 1024;
+        httpsReference.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+            @Override
+            public void onSuccess(byte[] bytes) {
+                // Data for "images/island.jpg" is returns, use this as needed
+                Bitmap bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+
+                toView.setImageBitmap(Bitmap.createScaledBitmap(bmp, 90, 90, false));
+                Toast.makeText(getApplicationContext(), "downloaded Image To Memory", Toast.LENGTH_SHORT).show();
+
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                // Handle any errors
+                Toast.makeText(getApplicationContext(), "onFailure downloaded Image To Local File "+exception.getMessage(), Toast.LENGTH_SHORT).show();
+                exception.printStackTrace();
+            }
+        });
+
+    }
+
+
+    public boolean deleteFile(String fileURL) {
+        StorageReference storageReference = FirebaseStorage.getInstance().getReferenceFromUrl(fileURL);
+        storageReference.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                // File deleted successfully
+                Toast.makeText(getApplicationContext(), "file deleted", Toast.LENGTH_SHORT).show();
+                Log.e("firebasestorage", "onSuccess: deleted file");
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                // Uh-oh, an error occurred!
+                Toast.makeText(getApplicationContext(), "onFailure: did not delete file "+exception.getMessage(), Toast.LENGTH_SHORT).show();
+
+                Log.e("firebasestorage", "onFailure: did not delete file"+exception.getMessage());
+                exception.printStackTrace();
+            }
+        });
+        return false;
+    }
 
 
 

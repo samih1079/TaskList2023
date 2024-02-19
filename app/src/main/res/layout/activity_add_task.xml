@@ -93,5 +93,12 @@
                 android:hint="Text" />
         </com.google.android.material.textfield.TextInputLayout>
 
+        <ImageButton
+            android:id="@+id/imageButton"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:scaleType="centerCrop"
+            app:srcCompat="@drawable/androidparty" />
+
     </LinearLayout>
 </RelativeLayout>
