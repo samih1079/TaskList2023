@@ -42,8 +42,8 @@ public class AddTaskActivity extends AppCompatActivity {
     private TextInputEditText etShortTitle, etText;
     private AutoCompleteTextView autoEtSubj;
     private Uri downladuri;
-    private int IMAGE_PICK_CODE=100;
-    private int PERMISSION_CODE=101;
+    private final int IMAGE_PICK_CODE=100;
+    private final int PERMISSION_CODE=101;
     private Uri toUploadimageUri;
 
     @Override
@@ -257,16 +257,16 @@ public class AddTaskActivity extends AppCompatActivity {
         startActivityForResult(intent,IMAGE_PICK_CODE);
     }
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults){
-        switch (requestCode){
-            case PERMISSION_CODE:{
-                if(grantResults.length>0 && grantResults[0]== PackageManager.PERMISSION_GRANTED){
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case PERMISSION_CODE: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     //permission was granted
                     pickImageFromGallery();
-                }
-                else {
+                } else {
                     //permission was denied
-                    Toast.makeText(this,"Permission denied...!",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Permission denied...!", Toast.LENGTH_SHORT).show();
                 }
             }
         }
