@@ -27,6 +27,8 @@ public class MyTask
     public long subjId;
     /**رقم المستعمل الذي اضاف المهمة*/
     public long userId;
+    //عنوان الصورة
+    private String image;
 
     @Override
     public String toString() {
@@ -39,5 +41,13 @@ public class MyTask
                 ", subjId=" + subjId +
                 ", userId=" + userId +
                 '}';
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
+    public String getImage() {
+        return image;
     }
 }

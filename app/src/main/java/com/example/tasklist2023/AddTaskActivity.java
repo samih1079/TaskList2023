@@ -56,6 +56,8 @@ public class AddTaskActivity extends AppCompatActivity {
     private Uri toUploadimageUri;// כתוב הקובץ(תמונה) שרוצים להעלות
     private Uri downladuri;//כתובת הקוץ בענן אחרי ההעלאה
     StorageTask uploadTask;// עצם לביצוע ההעלאה
+    private MySubject subject;
+    private MyTask myTask;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -153,69 +155,78 @@ public class AddTaskActivity extends AppCompatActivity {
 
         if(isAllOK)
         {
-            //קבלת הפניה למסד הניתונים
-            FirebaseFirestore db=FirebaseFirestore.getInstance();
-            //קבלת מזהה המשתמש שנכנס לאפליקציה
-            String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-            //קבלת קישור לאוסף המקצועות שנמצא במסמך המשתמש-לפי המזהה שלו-
-            CollectionReference subjCollection = db.collection("MyUsers")
-                    .document(uid)
-                    .collection("subjects");
-            //  לקבל מזהה ייחודי למסמך החדש
-            String sbjId = subjCollection.document().getId();
+
             //בניית עצם מקצוע עם מזהה של המשתמש שיצר אותו
-                MySubject subject=new MySubject();
-                subject.title=subjText;
-                subject.id=sbjId;
-                subject.userId=uid;
+            subject=new MySubject();
+            subject.title=subjText;
+
 
             //בניית עצם למשימה
-            MyTask myTask=new MyTask();
+            myTask=new MyTask();
             myTask.importance=importance;
             myTask.shortTitle=shortTitle;
             myTask.text=text;
-            myTask.subjId=subject.getKey_id();//קביעת מזהה המקצוע ששיכת לו המשימה
-            //הוספת מקצוע לאוסף המקצועות (מזהה המקצוע הוא השם שלו)
-                                                            //הוספת מאזין שבודק אם ההוספה הצליחה
-            subjCollection.document(subjText).set(subject).addOnCompleteListener(new OnCompleteListener<Void>() {
-                @Override
-                public void onComplete(@NonNull Task<Void> task) {
-                    if(task.isSuccessful())
-                    {
-                        //אם ההוספה של המקצוע הצליחה מוסיפים משימה למקצוע
-                        //קבלת קישור/כתובת לאוסף המשימות
-                        CollectionReference tasksCollection = subjCollection.document(subjText).collection("Tasks");
-                        // קבלת מזהה למסמך החדש
-                        String taskId = tasksCollection.document().getId();
-                        myTask.id=taskId;//עידכון תכונת המזהה של המשימה
-                        // הוספת (מסמך) המשימה לאוסף המשימות
-                                                                    //הוספת המאזין לבדיקת הצלחת ההוספה
-                        tasksCollection.document(taskId).set(myTask).addOnCompleteListener(new OnCompleteListener<Void>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Void> task) {
-                                if(task.isSuccessful())
-                                {
-                                    Toast.makeText(AddTaskActivity.this, "Adding myTask Succeeded", Toast.LENGTH_SHORT).show();
-                                    finish();;
-                                }
-                                else
-                                {
-                                    Toast.makeText(AddTaskActivity.this, "Adding myTask failed"+task.getException().toString(), Toast.LENGTH_SHORT).show();
-
-                                }
-                            }
-                        });
-                    }
-                    else
-                    {
-                        Toast.makeText(AddTaskActivity.this, "Adding mySubject failed"+task.getException().toString(), Toast.LENGTH_SHORT).show();
-
-                    }
-                }
-            });
-
+            //myTask.subjId=subject.getKey_id();//קביעת מזהה המקצוע ששיכת לו המשימה
+            //ביצוע העלאת התמונה ואחרי שהתמונה עלתה שומרים את הכתובת שלה בעצם ושומרום אותו במסד הנתונים
+            uploadImage(toUploadimageUri);
 
         }
+    }
+
+    private void saveSubjAndTask()
+    {
+        //קבלת הפניה למסד הניתונים
+        FirebaseFirestore db=FirebaseFirestore.getInstance();
+        //קבלת מזהה המשתמש שנכנס לאפליקציה
+        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        //קבלת קישור לאוסף המקצועות שנמצא במסמך המשתמש-לפי המזהה שלו-
+        CollectionReference subjCollection = db.collection("MyUsers")
+                .document(uid)
+                .collection("subjects");
+        //  לקבל מזהה ייחודי למסמך החדש
+        String sbjId = subjCollection.document().getId();
+        subject.id=sbjId;
+        subject.userId=uid;
+        //הוספת מקצוע לאוסף המקצועות (מזהה המקצוע הוא השם שלו)
+        //הוספת מאזין שבודק אם ההוספה הצליחה
+
+        subjCollection.document(subject.title).set(subject).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if(task.isSuccessful())
+                {
+                    //אם ההוספה של המקצוע הצליחה מוסיפים משימה למקצוע
+                    //קבלת קישור/כתובת לאוסף המשימות
+                    CollectionReference tasksCollection = subjCollection.document(subject.title).collection("Tasks");
+                    // קבלת מזהה למסמך החדש
+                    String taskId = tasksCollection.document().getId();
+                    myTask.id=taskId;//עידכון תכונת המזהה של המשימה
+                    // הוספת (מסמך) המשימה לאוסף המשימות
+                    //הוספת המאזין לבדיקת הצלחת ההוספה
+                    tasksCollection.document(taskId).set(myTask).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if(task.isSuccessful())
+                            {
+                                Toast.makeText(AddTaskActivity.this, "Adding myTask Succeeded", Toast.LENGTH_SHORT).show();
+                                finish();;
+                            }
+                            else
+                            {
+                                Toast.makeText(AddTaskActivity.this, "Adding myTask failed"+task.getException().toString(), Toast.LENGTH_SHORT).show();
+
+                            }
+                        }
+                    });
+                }
+                else
+                {
+                    Toast.makeText(AddTaskActivity.this, "Adding mySubject failed"+task.getException().toString(), Toast.LENGTH_SHORT).show();
+
+                }
+            }
+        });
+
     }
 
     //upload: 6
@@ -233,7 +244,9 @@ public class AddTaskActivity extends AppCompatActivity {
             //יצירת תיקיה ושם גלובלי לקובץ
             final StorageReference ref = storageReference.child("images/"+ UUID.randomUUID().toString());
             // יצירת ״תהליך מקביל״ להעלאת תמונה
-            StorageTask<UploadTask.TaskSnapshot> uploadTask = ref.putFile(filePath).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+            StorageTask<UploadTask.TaskSnapshot> uploadTask = ref.putFile(filePath)
+                    //הוספת מאזין למצב ההעלאה
+                    .addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                         @Override
                         public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
                             if(task.isSuccessful())
@@ -245,43 +258,25 @@ public class AddTaskActivity extends AppCompatActivity {
                                     public void onComplete(@NonNull Task<Uri> task) {
                                         downladuri = task.getResult();
                                         Toast.makeText(getApplicationContext(), "Uploaded", Toast.LENGTH_SHORT).show();
+                                        myTask.setImage(downladuri.toString());//עידכון כתובת התמונה שהועלתה
 
+                                        saveSubjAndTask();
                                     }
                                 });
                             }
                             else
                             {
+                                progressDialog.dismiss();
+                                Toast.makeText(getApplicationContext(), "Failed " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
 
                             }
                         }
                     })
-//                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-//
-//                        @Override
-//                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-//                            progressDialog.dismiss();// הסתרת הדיאלוג
-//                            //קבלת כתובת הקובץ שהועלה
-//                            ref.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
-//                                @Override
-//                                public void onComplete(@NonNull Task<Uri> task) {
-//                                    downladuri = task.getResult();
-//
-//                                }
-//                            });
-//
-//                            Toast.makeText(getApplicationContext(), "Uploaded", Toast.LENGTH_SHORT).show();
-//                        }
-//                    })
-//                    .addOnFailureListener(new OnFailureListener() {
-//                        @Override
-//                        public void onFailure(@NonNull Exception e) {
-//                            progressDialog.dismiss();
-//                            Toast.makeText(getApplicationContext(), "Failed " + e.getMessage(), Toast.LENGTH_SHORT).show();
-//                        }
-//                    })
+                    //הוספת מאזין שמציג מהו אחוז ההעלאה
                     .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
                         @Override
                         public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+                            //חישוב מה הגודל שהועלה
                             double progress = (100.0 * taskSnapshot.getBytesTransferred() / taskSnapshot
                                     .getTotalByteCount());
                             progressDialog.setMessage("Uploaded " + (int) progress + "%");
@@ -289,7 +284,7 @@ public class AddTaskActivity extends AppCompatActivity {
                     });
         }else
         {
-
+            saveSubjAndTask();
         }
     }
     //upload:4
