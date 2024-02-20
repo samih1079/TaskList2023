@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.Toast;
 
@@ -41,10 +42,20 @@ public class AddTaskActivity extends AppCompatActivity {
     private SeekBar sbImportance;
     private TextInputEditText etShortTitle, etText;
     private AutoCompleteTextView autoEtSubj;
-    private Uri downladuri;
-    private final int IMAGE_PICK_CODE=100;
-    private final int PERMISSION_CODE=101;
-    private Uri toUploadimageUri;
+    //upload: 0.1 add firebase storage
+    //upload: 0.2 add this permissions to manifest xml
+    //          <uses-permission android:name="android.permission.INTERNET" />
+    //          <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
+    //upload: 1 add Xml image view or button and upload button
+    //upload: 2 add next fileds
+    private final int IMAGE_PICK_CODE=100;// קוד מזהה לבקשת בחירת תמונה
+    private final int PERMISSION_CODE=101;//קוד מזהה לבחירת הרשאת גישה לקבצים
+    private ImageButton imgBtnl;//כפתור/ לחצן לבחירת תמונה והצגתה
+    private Button btnUpload;// לחצן לביצוע העלאת התמונה
+    private Uri toUploadimageUri;// כתוב הקובץ(תמונה) שרוצים להעלות
+    private Uri downladuri;//כתובת הקוץ בענן אחרי ההעלאה
+    StorageTask uploadTask;// עצם לביצוע ההעלאה
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,8 +68,14 @@ public class AddTaskActivity extends AppCompatActivity {
         sbImportance=findViewById(R.id.skbrImportance);
         btnSave=findViewById(R.id.btnSaveTask);
         btnCancel=findViewById(R.id.btnCancelTask);
+        //upload: 3
+        imgBtnl=findViewById(R.id.imgBtn);
+        imgBtnl.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
 
-
+            }
+        });
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -201,42 +218,67 @@ public class AddTaskActivity extends AppCompatActivity {
         }
     }
 
-    //upload: 5
+    //upload: 6
     private void uploadImage(Uri filePath) {
 
         if(filePath != null)
         {
+            //יצירת דיאלוג התקדמות
             final ProgressDialog progressDialog = new ProgressDialog(this);
             progressDialog.setTitle("Uploading...");
-            progressDialog.show();
+            progressDialog.show();//הצגת הדיאלוג
+            //קבלץ כתובת האחסון בענן
             FirebaseStorage storage= FirebaseStorage.getInstance();
             StorageReference storageReference = storage.getReference();
+            //יצירת תיקיה ושם גלובלי לקובץ
             final StorageReference ref = storageReference.child("images/"+ UUID.randomUUID().toString());
-            StorageTask<UploadTask.TaskSnapshot> uploadTask = ref.putFile(filePath)
-                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-
+            // יצירת ״תהליך מקביל״ להעלאת תמונה
+            StorageTask<UploadTask.TaskSnapshot> uploadTask = ref.putFile(filePath).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                         @Override
-                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                            progressDialog.dismiss();
-                            ref.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
-                                @Override
-                                public void onComplete(@NonNull Task<Uri> task) {
-                                    downladuri = task.getResult();
-                                   // t.setImage(downladuri.toString());
+                        public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                            if(task.isSuccessful())
+                            {
+                                progressDialog.dismiss();// הסתרת הדיאלוג
+                                //קבלת כתובת הקובץ שהועלה
+                                ref.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Uri> task) {
+                                        downladuri = task.getResult();
+                                        Toast.makeText(getApplicationContext(), "Uploaded", Toast.LENGTH_SHORT).show();
 
-                                }
-                            });
+                                    }
+                                });
+                            }
+                            else
+                            {
 
-                            Toast.makeText(getApplicationContext(), "Uploaded", Toast.LENGTH_SHORT).show();
+                            }
                         }
                     })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            progressDialog.dismiss();
-                            Toast.makeText(getApplicationContext(), "Failed " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                        }
-                    })
+//                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+//
+//                        @Override
+//                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+//                            progressDialog.dismiss();// הסתרת הדיאלוג
+//                            //קבלת כתובת הקובץ שהועלה
+//                            ref.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
+//                                @Override
+//                                public void onComplete(@NonNull Task<Uri> task) {
+//                                    downladuri = task.getResult();
+//
+//                                }
+//                            });
+//
+//                            Toast.makeText(getApplicationContext(), "Uploaded", Toast.LENGTH_SHORT).show();
+//                        }
+//                    })
+//                    .addOnFailureListener(new OnFailureListener() {
+//                        @Override
+//                        public void onFailure(@NonNull Exception e) {
+//                            progressDialog.dismiss();
+//                            Toast.makeText(getApplicationContext(), "Failed " + e.getMessage(), Toast.LENGTH_SHORT).show();
+//                        }
+//                    })
                     .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
                         @Override
                         public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
@@ -250,6 +292,7 @@ public class AddTaskActivity extends AppCompatActivity {
 
         }
     }
+    //upload:4
     private void pickImageFromGallery(){
         //intent to pick image
         Intent intent=new Intent(Intent.ACTION_PICK);
@@ -272,14 +315,21 @@ public class AddTaskActivity extends AppCompatActivity {
         }
     }
 
-    //handle result of picked images
+    //upload: 5:handle result of picked images
+    /**
+     *
+     * @param requestCode מספר הקשה
+     * @param resultCode תוצאה הבקשה (אם נבחר משהו או בוטלה)
+     * @param data הנתונים שניבחרו
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data){
         super.onActivityResult(requestCode,resultCode,data);
+        //אם נבחר משהו ואם זה קוד בקשת התמונה
         if (resultCode==RESULT_OK && requestCode== IMAGE_PICK_CODE){
             //set image to image view
-            toUploadimageUri = data.getData();
-           // imgBtnl.setImageURI(toUploadimageUri);
+            toUploadimageUri = data.getData();//קבלת כתובת התמונה הנתונים שניבחרו
+            imgBtnl.setImageURI(toUploadimageUri);// הצגת התמונה שנבחרה על רכיב התמונה
         }
     }
 }
