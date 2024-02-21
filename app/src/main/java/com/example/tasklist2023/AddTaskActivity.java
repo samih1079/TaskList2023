@@ -39,7 +39,7 @@ import java.util.List;
 import java.util.UUID;
 
 public class AddTaskActivity extends AppCompatActivity {
-    private Button btnSave,btnCancel;
+    private Button btnSave, btnCancel;
     private SeekBar sbImportance;
     private TextInputEditText etShortTitle, etText;
     private AutoCompleteTextView autoEtSubj;
@@ -50,8 +50,8 @@ public class AddTaskActivity extends AppCompatActivity {
 
     //upload: 1 add Xml image view or button and upload button
     //upload: 2 add next fileds
-    private final int IMAGE_PICK_CODE=100;// קוד מזהה לבקשת בחירת תמונה
-    private final int PERMISSION_CODE=101;//קוד מזהה לבחירת הרשאת גישה לקבצים
+    private final int IMAGE_PICK_CODE = 100;// קוד מזהה לבקשת בחירת תמונה
+    private final int PERMISSION_CODE = 101;//קוד מזהה לבחירת הרשאת גישה לקבצים
     private ImageButton imgBtnl;//כפתור/ לחצן לבחירת תמונה והצגתה
     private Button btnUpload;// לחצן לביצוע העלאת התמונה
     private Uri toUploadimageUri;// כתוב הקובץ(תמונה) שרוצים להעלות
@@ -64,15 +64,15 @@ public class AddTaskActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_task);
-        autoEtSubj =findViewById(R.id.autoEtSubj);
+        autoEtSubj = findViewById(R.id.autoEtSubj);
         initAutoEtSubjects();//دالة لاستخراج القيم وعرضها بالحقل السابق
-        etShortTitle=findViewById(R.id.etShortTitle);
-        etText=findViewById(R.id.etText);
-        sbImportance=findViewById(R.id.skbrImportance);
-        btnSave=findViewById(R.id.btnSaveTask);
-        btnCancel=findViewById(R.id.btnCancelTask);
+        etShortTitle = findViewById(R.id.etShortTitle);
+        etText = findViewById(R.id.etText);
+        sbImportance = findViewById(R.id.skbrImportance);
+        btnSave = findViewById(R.id.btnSaveTask);
+        btnCancel = findViewById(R.id.btnCancelTask);
         //upload: 3
-        imgBtnl=findViewById(R.id.imgBtn);
+        imgBtnl = findViewById(R.id.imgBtn);
         imgBtnl.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -84,7 +84,7 @@ public class AddTaskActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 checkAndSaveTask_FB();
-               // checkAndSaveTask();
+                // checkAndSaveTask();
             }
         });
     }
@@ -96,7 +96,7 @@ public class AddTaskActivity extends AppCompatActivity {
      */
     private void initAutoEtSubjects() {
         //مؤشر لقعادة الباينات
-        AppDataBase db=AppDataBase.getDB(getApplicationContext());
+        AppDataBase db = AppDataBase.getDB(getApplicationContext());
         //مؤشر لواجهة استعملامات جدول المواضيع
         MySubjectQuery subjectQuery = db.getMySubjectQuery();
         //ااستخراج جميع المواضيع من الجدول
@@ -115,70 +115,68 @@ public class AddTaskActivity extends AppCompatActivity {
         });
     }
 
-///khkjhj
-    private void checkAndSaveTask()
-    {
-        boolean isAllOK=true;
-        String subjText=autoEtSubj.getText().toString();
-        String shortTitle=etShortTitle.getText().toString();
-        String text=etText.getText().toString();
-        int importance=sbImportance.getProgress();
+    ///khkjhj
+    private void checkAndSaveTask() {
+        boolean isAllOK = true;
+        String subjText = autoEtSubj.getText().toString();
+        String shortTitle = etShortTitle.getText().toString();
+        String text = etText.getText().toString();
+        int importance = sbImportance.getProgress();
 
-        if(isAllOK)
-        {
-            AppDataBase db=AppDataBase.getDB(getApplicationContext());
+        if (isAllOK) {
+            AppDataBase db = AppDataBase.getDB(getApplicationContext());
             MySubjectQuery subjectQuery = db.getMySubjectQuery();
-            if(subjectQuery.checkSubject(subjText)==null)//فحص هل الموضوع موجود من قبل بالجدول
+            if (subjectQuery.checkSubject(subjText) == null)//فحص هل الموضوع موجود من قبل بالجدول
             {   //بناء موضوع جديد واضافته
-                MySubject subject=new MySubject();
-                subject.title=subjText;
+                MySubject subject = new MySubject();
+                subject.title = subjText;
                 subjectQuery.insert(subject);
             }
             //استخراج الموضوع لاننا بحاجة لرقمه التسلسلي id
             MySubject subject = subjectQuery.checkSubject(subjText);
             //بناء مهمة جديدة وتحديد صفاتها
-            MyTask task=new MyTask();
-            task.importance=importance;
-            task.shortTitle=shortTitle;
-            task.text=text;
-            task.subjId=subject.getKey_id();//تحديد رقم الموضوع للمهمة
+            MyTask task = new MyTask();
+            task.importance = importance;
+            task.shortTitle = shortTitle;
+            task.text = text;
+            task.subjId = subject.getKey_id();//تحديد رقم الموضوع للمهمة
             db.getMyTaskQuery().insertTask(task);//اضافة المهمة للجدول
             finish();//اغلاق الشاشة
         }
     }
 
-    private void checkAndSaveTask_FB()
-    {
-        boolean isAllOK=true;
-        String subjText=autoEtSubj.getText().toString();
-        String shortTitle=etShortTitle.getText().toString();
-        String text=etText.getText().toString();
-        int importance=sbImportance.getProgress();
-
-        if(isAllOK)
-        {
-
+    private void checkAndSaveTask_FB() {
+        boolean isAllOK = true;
+        String subjText = autoEtSubj.getText().toString();
+        String shortTitle = etShortTitle.getText().toString();
+        String text = etText.getText().toString();
+        int importance = sbImportance.getProgress();
+        if (subjText.length() == 0) {
+            isAllOK = false;
+            autoEtSubj.setError("must wrute or select subject");
+        }
+        if (shortTitle.length() == 0) {
+            isAllOK = false;
+            etShortTitle.setError("must write title min 1 char");
+        }
+        if (isAllOK) {
             //בניית עצם מקצוע עם מזהה של המשתמש שיצר אותו
-            subject=new MySubject();
-            subject.title=subjText;
-
-
+            subject = new MySubject();
+            subject.title = subjText;
             //בניית עצם למשימה
-            myTask=new MyTask();
-            myTask.importance=importance;
-            myTask.shortTitle=shortTitle;
-            myTask.text=text;
+            myTask = new MyTask();
+            myTask.importance = importance;
+            myTask.shortTitle = shortTitle;
+            myTask.text = text;
             //myTask.subjId=subject.getKey_id();//קביעת מזהה המקצוע ששיכת לו המשימה
             //ביצוע העלאת התמונה ואחרי שהתמונה עלתה שומרים את הכתובת שלה בעצם ושומרום אותו במסד הנתונים
             uploadImage(toUploadimageUri);
-
         }
     }
 
-    private void saveSubjAndTask()
-    {
+    private void saveSubjAndTask() {
         //קבלת הפניה למסד הניתונים
-        FirebaseFirestore db=FirebaseFirestore.getInstance();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
         //קבלת מזהה המשתמש שנכנס לאפליקציה
         String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
         //קבלת קישור לאוסף המקצועות שנמצא במסמך המשתמש-לפי המזהה שלו-
@@ -187,72 +185,62 @@ public class AddTaskActivity extends AppCompatActivity {
                 .collection("subjects");
         //  לקבל מזהה ייחודי למסמך החדש
         String sbjId = subjCollection.document().getId();
-        subject.id=sbjId;
-        subject.userId=uid;
+        subject.id = sbjId;
+        subject.userId = uid;
         //הוספת מקצוע לאוסף המקצועות (מזהה המקצוע הוא השם שלו)
         //הוספת מאזין שבודק אם ההוספה הצליחה
-
         subjCollection.document(subject.title).set(subject).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
-                if(task.isSuccessful())
-                {
+                if (task.isSuccessful()) {
                     //אם ההוספה של המקצוע הצליחה מוסיפים משימה למקצוע
                     //קבלת קישור/כתובת לאוסף המשימות
                     CollectionReference tasksCollection = subjCollection.document(subject.title).collection("Tasks");
                     // קבלת מזהה למסמך החדש
                     String taskId = tasksCollection.document().getId();
-                    myTask.id=taskId;//עידכון תכונת המזהה של המשימה
+                    myTask.id = taskId;//עידכון תכונת המזהה של המשימה
                     // הוספת (מסמך) המשימה לאוסף המשימות
                     //הוספת המאזין לבדיקת הצלחת ההוספה
                     tasksCollection.document(taskId).set(myTask).addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
-                            if(task.isSuccessful())
-                            {
+                            if (task.isSuccessful()) {
                                 Toast.makeText(AddTaskActivity.this, "Adding myTask Succeeded", Toast.LENGTH_SHORT).show();
-                                finish();;
-                            }
-                            else
-                            {
-                                Toast.makeText(AddTaskActivity.this, "Adding myTask failed"+task.getException().toString(), Toast.LENGTH_SHORT).show();
+                                finish();
+                                ;
+                            } else {
+                                Toast.makeText(AddTaskActivity.this, "Adding myTask failed" + task.getException().toString(), Toast.LENGTH_SHORT).show();
 
                             }
                         }
                     });
-                }
-                else
-                {
-                    Toast.makeText(AddTaskActivity.this, "Adding mySubject failed"+task.getException().toString(), Toast.LENGTH_SHORT).show();
-
+                } else {
+                    Toast.makeText(AddTaskActivity.this, "Adding mySubject failed" + task.getException().toString(), Toast.LENGTH_SHORT).show();
                 }
             }
         });
-
     }
 
     //upload: 6
     private void uploadImage(Uri filePath) {
 
-        if(filePath != null)
-        {
+        if (filePath != null) {
             //יצירת דיאלוג התקדמות
             final ProgressDialog progressDialog = new ProgressDialog(this);
             progressDialog.setTitle("Uploading...");
             progressDialog.show();//הצגת הדיאלוג
             //קבלץ כתובת האחסון בענן
-            FirebaseStorage storage= FirebaseStorage.getInstance();
+            FirebaseStorage storage = FirebaseStorage.getInstance();
             StorageReference storageReference = storage.getReference();
             //יצירת תיקיה ושם גלובלי לקובץ
-            final StorageReference ref = storageReference.child("images/"+ UUID.randomUUID().toString());
+            final StorageReference ref = storageReference.child("images/" + UUID.randomUUID().toString());
             // יצירת ״תהליך מקביל״ להעלאת תמונה
-            StorageTask<UploadTask.TaskSnapshot> uploadTask = ref.putFile(filePath)
+           ref.putFile(filePath)
                     //הוספת מאזין למצב ההעלאה
                     .addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                         @Override
                         public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
-                            if(task.isSuccessful())
-                            {
+                            if (task.isSuccessful()) {
                                 progressDialog.dismiss();// הסתרת הדיאלוג
                                 //קבלת כתובת הקובץ שהועלה
                                 ref.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
@@ -265,12 +253,9 @@ public class AddTaskActivity extends AppCompatActivity {
                                         saveSubjAndTask();
                                     }
                                 });
-                            }
-                            else
-                            {
+                            } else {
                                 progressDialog.dismiss();
                                 Toast.makeText(getApplicationContext(), "Failed " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-
                             }
                         }
                     })
@@ -284,42 +269,41 @@ public class AddTaskActivity extends AppCompatActivity {
                             progressDialog.setMessage("Uploaded " + (int) progress + "%");
                         }
                     });
-        }else
-        {
+        } else {
             saveSubjAndTask();
         }
     }
 
     //upload:4
-    private void pickImageFromGallery(){
+    private void pickImageFromGallery() {
         //intent to pick image
-        Intent intent=new Intent(Intent.ACTION_PICK);
+        Intent intent = new Intent(Intent.ACTION_PICK);
         intent.setType("image/*");
-        startActivityForResult(intent,IMAGE_PICK_CODE);
+        startActivityForResult(intent, IMAGE_PICK_CODE);
     }
     //upload: 5:handle result of picked images
+
     /**
-     *
      * @param requestCode מספר הקשה
-     * @param resultCode תוצאה הבקשה (אם נבחר משהו או בוטלה)
-     * @param data הנתונים שניבחרו
+     * @param resultCode  תוצאה הבקשה (אם נבחר משהו או בוטלה)
+     * @param data        הנתונים שניבחרו
      */
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data){
-        super.onActivityResult(requestCode,resultCode,data);
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
         //אם נבחר משהו ואם זה קוד בקשת התמונה
-        if (resultCode==RESULT_OK && requestCode== IMAGE_PICK_CODE){
+        if (resultCode == RESULT_OK && requestCode == IMAGE_PICK_CODE) {
             //set image to image view
             toUploadimageUri = data.getData();//קבלת כתובת התמונה הנתונים שניבחרו
             imgBtnl.setImageURI(toUploadimageUri);// הצגת התמונה שנבחרה על רכיב התמונה
         }
     }
     //upload: 6
+
     /**
      * בדיקה האם יש הרשאה לגישה לקבצים בטלפון
      */
-    private void checkPermission()
-    {
+    private void checkPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {//בדיקת גרסאות
             //בדיקה אם ההשאה לא אושרה בעבר
             if (checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
@@ -332,22 +316,22 @@ public class AddTaskActivity extends AppCompatActivity {
                 //permission already granted אם יש הרשאה מקודם אז מפעילים בחירת תמונה מהטלפון
                 pickImageFromGallery();
             }
-        }
-        else {//אם גרסה ישנה ולא צריך קבלת אישור
+        } else {//אם גרסה ישנה ולא צריך קבלת אישור
             pickImageFromGallery();
         }
     }
     //upload: 7
+
     /**
-     * @param requestCode The request code passed in מספר בקשת ההרשאה
-     * @param permissions The requested permissions. Never null. רשימת ההרשאות לאישור
+     * @param requestCode  The request code passed in מספר בקשת ההרשאה
+     * @param permissions  The requested permissions. Never null. רשימת ההרשאות לאישור
      * @param grantResults The grant results for the corresponding permissions תוצאה עבור כל הרשאה
-     *   PERMISSION_GRANTED אושר or PERMISSION_DENIED נדחה . Never null.
+     *                     PERMISSION_GRANTED אושר or PERMISSION_DENIED נדחה . Never null.
      */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode==PERMISSION_CODE) {//בדיקת קוד בקשת ההרשאה
+        if (requestCode == PERMISSION_CODE) {//בדיקת קוד בקשת ההרשאה
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 //permission was granted אם יש אישור
                 pickImageFromGallery();
