@@ -18,6 +18,9 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+/**
+ * מסך רישום לפי מיל וסיסמא
+ */
 public class SignUpActivity extends AppCompatActivity {
     private Button btnSave, btnCancel;
     private TextInputEditText etName, etEmail,

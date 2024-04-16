@@ -15,17 +15,13 @@
 
         <Button
             android:id="@+id/btnSave"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
+            style="@style/MyButtonStyle"
             android:onClick="onClick"
             android:text="Save" />
 
         <Button
             android:id="@+id/btnCancel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
+           style="@style/MyButtonStyle"
             android:text="Cancel" />
     </LinearLayout>
 

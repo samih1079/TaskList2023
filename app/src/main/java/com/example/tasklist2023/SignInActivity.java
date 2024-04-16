@@ -18,6 +18,9 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 
+/**
+ * מסך כניסה בעזרת מיל וסיסמא
+ */
 public class SignInActivity extends AppCompatActivity {
     private TextInputEditText etEamil, etPassword;
     private Button btnSignUp;

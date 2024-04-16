@@ -38,10 +38,25 @@ import com.google.firebase.storage.UploadTask;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * מסך הוספת מטלה
+ */
 public class AddTaskActivity extends AppCompatActivity {
+    /**
+     * לחצני שמירה וביטול בהתאם
+     */
     private Button btnSave, btnCancel;
+    /**
+     * רכיב לקביעות חשיבות
+     */
     private SeekBar sbImportance;
+    /**
+     * שדות קלט לכותרת וגוף המטלה
+     */
     private TextInputEditText etShortTitle, etText;
+    /**
+     * שדה קלט עם אפשרות השלמה אוטומטית לבחירת נושא
+     */
     private AutoCompleteTextView autoEtSubj;
     //upload: 0.1 add firebase storage
     //upload: 0.2 add this permissions to manifest xml
@@ -52,6 +67,9 @@ public class AddTaskActivity extends AppCompatActivity {
     //upload: 2 add next fileds
     private final int IMAGE_PICK_CODE = 100;// קוד מזהה לבקשת בחירת תמונה
     private final int PERMISSION_CODE = 101;//קוד מזהה לבחירת הרשאת גישה לקבצים
+    /**
+     * הצכת ובחירת תמונה
+     */
     private ImageButton imgBtnl;//כפתור/ לחצן לבחירת תמונה והצגתה
     private Button btnUpload;// לחצן לביצוע העלאת התמונה
     private Uri toUploadimageUri;// כתוב הקובץ(תמונה) שרוצים להעלות

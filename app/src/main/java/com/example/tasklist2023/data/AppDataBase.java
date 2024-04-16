@@ -13,7 +13,7 @@ import androidx.room.Room;
 import androidx.room.RoomDatabase;
 
 
-/*
+/**
 تعريف الجداول ورقم الاصدار
 version
 عند تغيير اي شي يخص جدول او داول علينا تغيير رقم الاصدار
@@ -34,26 +34,26 @@ public abstract class  AppDataBase extends RoomDatabase
 
     /**
      * يعيد كائن لعمليات جدول المستعملين
-     * @return
+     * @return ..  يعيد كائن لعمليات جدول المستعملين
      */
     public abstract MyUserQuery getMyUserQuery();
 
     /**
      * يعيد كائن لعمليات جدول الموضيع
-     * @return
+     * @return .. يعيد كائن لعمليات جدول الموضيع
      */
     public abstract MySubjectQuery getMySubjectQuery();
 
     /**
      * يعيد كائن لعمليات جدول المهمات
-     * @return
+     * @return ..      * يعيد كائن لعمليات جدول المهمات
      */
     public abstract MyTaskQuery getMyTaskQuery();
 
     /**
      * بناء قاعدة البيانات واعادة كائن يؤشر عليها
-     * @param context
-     * @return
+     * @param context היקשר (אפליקציה, מסך..) ששיך לא מסד הניתונים
+     * @return ..      * بناء قاعدة البيانات واعادة كائن يؤشر عليها
      */
     public static AppDataBase getDB(Context context)
     {

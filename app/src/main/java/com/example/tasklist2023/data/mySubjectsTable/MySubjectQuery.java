@@ -10,6 +10,9 @@ import com.example.tasklist2023.data.mytasksTable.MyTask;
 
 import java.util.List;
 
+/**
+ * ממשק פעולות עם טבלת הנושאים במסד הניתונים
+ */
 @Dao
 public interface MySubjectQuery {
     /**

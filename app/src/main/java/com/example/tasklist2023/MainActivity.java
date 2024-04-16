@@ -27,6 +27,7 @@ import com.example.tasklist2023.data.AppDataBase;
 import com.example.tasklist2023.data.mySubjectsTable.MySubject;
 import com.example.tasklist2023.data.mySubjectsTable.MySubjectQuery;
 import com.example.tasklist2023.data.mytasksTable.MyTask;
+import com.example.tasklist2023.data.mytasksTable.MyTaskAdapter;
 import com.example.tasklist2023.data.mytasksTable.MyTaskQuery;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -49,11 +50,15 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * מסך ראשי מציג כל המטלות עם אפשרות חיפוש והוספה
+ */
 public class MainActivity extends AppCompatActivity {
     //spnr1 تعريف صفة للكائن المرئي
     private Spinner spnrSubject;
     private FloatingActionButton fabAdd;
     private ListView lstTasks;
+    private MyTaskAdapter  taskAdapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,8 +76,8 @@ public class MainActivity extends AppCompatActivity {
        spnrSubject = findViewById(R.id.spnrSubject);
         initSubjectSpnr_FB();
         lstTasks=findViewById(R.id.lstvTasks);
-        //initAllListView_FB();
-        realTimeUpdate_subjects();
+        initAllListView_FB();
+        //realTimeUpdate_subjects();
 
 
 
