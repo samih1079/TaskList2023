@@ -11,8 +11,8 @@
 
         <ImageView
             android:id="@+id/imgVitm"
-            android:layout_width="150dp"
-            android:layout_height="150dp"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
             android:src="@drawable/androidparty" />
 
         <LinearLayout
@@ -39,9 +39,16 @@
                 android:layout_height="wrap_content"
                 android:text="For Importance" />
 
+            <CheckBox
+                android:id="@+id/checkBox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Completed" />
+
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
                 <ImageView
@@ -64,6 +71,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:src="@android:drawable/ic_menu_edit" />
+
                 <ImageView
                     android:id="@+id/imgBtnDeleteitm"
                     android:layout_width="wrap_content"
@@ -72,6 +80,8 @@
                     android:src="@android:drawable/ic_delete" />
 
             </LinearLayout>
+
         </LinearLayout>
+
     </LinearLayout>
 </LinearLayout>

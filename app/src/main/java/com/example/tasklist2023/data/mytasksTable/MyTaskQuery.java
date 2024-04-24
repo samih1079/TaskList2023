@@ -23,7 +23,7 @@ public interface MyTaskQuery {
     /**
      * ارجاع المهمات حسب المستعمل واذا انتهت ام لا ومرتبة تنازليا حسب الاهمية
      * @param userid_p* رقم المستعمل
-     * @return
+     * @return .. قائمة مهمات
      */
     @Query("SELECT * FROM MyTask WHERE userId=:userid_p  " +
             "ORDER BY time DESC")

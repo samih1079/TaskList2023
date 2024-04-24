@@ -1,7 +1,12 @@
 package com.example.tasklist2023.data.mytasksTable;
 
 
+import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
+import static androidx.core.content.ContextCompat.startActivity;
+
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +15,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -50,10 +56,10 @@ public class MyTaskAdapter extends ArrayAdapter<MyTask> {
         TextView tvTitle=vitem.findViewById(R.id.tvItmTitle);
         TextView tvText=vitem.findViewById(R.id.tvItmText);
         TextView tvImportance=vitem.findViewById(R.id.tvItmImportance);
-        ImageButton btnSendSMS=vitem.findViewById(R.id.imgBtnSendSmsitm);
-        ImageButton btnEdit=vitem.findViewById(R.id.imgBtnEdititm);
-        ImageButton btnCall=vitem.findViewById(R.id.imgBtnCallitm);
-        ImageButton btnDel=vitem.findViewById(R.id.imgBtnDeleteitm);
+        ImageView btnSendSMS=vitem.findViewById(R.id.imgBtnSendSmsitm);
+        ImageView btnEdit=vitem.findViewById(R.id.imgBtnEdititm);
+        ImageView btnCall=vitem.findViewById(R.id.imgBtnCallitm);
+        ImageView btnDel=vitem.findViewById(R.id.imgBtnDeleteitm);
         //קבלת הנתון (עצם) הנוכחי
         MyTask current=getItem(position);
         //הצגת הנתונים על שדות הריב הגרפי
@@ -61,6 +67,29 @@ public class MyTaskAdapter extends ArrayAdapter<MyTask> {
         tvText.setText(current.getText());
         tvImportance.setText("Importance:"+current.getImportance());
 
+        btnDel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(getContext(), "deleted", Toast.LENGTH_SHORT).show();
+            }
+        });
+        btnCall.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+        btnSendSMS.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent smsIntent = new Intent(Intent.ACTION_SENDTO);
+                smsIntent.setData(Uri.parse("smsto:"+""));
+                smsIntent.addFlags(FLAG_ACTIVITY_NEW_TASK);
+                smsIntent.addCategory(Intent.CATEGORY_DEFAULT);
+                smsIntent.putExtra("sms_body",current.getShortTitle()+" "+current.getText());
+                getContext().startActivity(smsIntent);
+            }
+        });
         return vitem;
 
     }

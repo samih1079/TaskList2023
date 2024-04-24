@@ -138,8 +138,10 @@ public class MainActivity extends AppCompatActivity {
      * تجهيز قائمة جميع المهمات وعرضها ب ListView
      */
     private void initAllListView_FB() {
-        ArrayAdapter<MyTask> tasksAdapter=new ArrayAdapter<MyTask>(this, android.R.layout.simple_list_item_1);
+       // ArrayAdapter<MyTask> tasksAdapter=new ArrayAdapter<MyTask>(this, android.R.layout.simple_list_item_1);
+        MyTaskAdapter tasksAdapter=new MyTaskAdapter(getApplicationContext(),R.layout.task_item_layout);
         lstTasks.setAdapter(tasksAdapter);
+
         FirebaseFirestore ffRef = FirebaseFirestore.getInstance();
         if(spnrSubject==null || spnrSubject.getSelectedItem()==null)
             return;
