@@ -48,6 +48,7 @@ import com.google.firebase.storage.StorageReference;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -58,12 +59,15 @@ public class MainActivity extends AppCompatActivity {
     private Spinner spnrSubject;
     private FloatingActionButton fabAdd;
     private ListView lstTasks;
-    private MyTaskAdapter  taskAdapter;
+    private MyTaskAdapter tasksAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        lstTasks=findViewById(R.id.lstvTasks);//הפניה לרכיב הגרפי שמציג אוסף
+        tasksAdapter=new MyTaskAdapter(this,R.layout.task_item_layout);//בניית המתאם
+        lstTasks.setAdapter(tasksAdapter);//קישור המתאם אם המציג הגרפי לאוסף
         fabAdd=findViewById(R.id.fabAdd);
         fabAdd.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -75,7 +79,6 @@ public class MainActivity extends AppCompatActivity {
         //spnr2 وضع مؤشر الصفة على الكائن المرئي الموجود بواجهة المستعمل
        spnrSubject = findViewById(R.id.spnrSubject);
         initSubjectSpnr_FB();
-        lstTasks=findViewById(R.id.lstvTasks);
         initAllListView_FB();
         //realTimeUpdate_subjects();
 
@@ -138,29 +141,16 @@ public class MainActivity extends AppCompatActivity {
      * تجهيز قائمة جميع المهمات وعرضها ب ListView
      */
     private void initAllListView_FB() {
-       // ArrayAdapter<MyTask> tasksAdapter=new ArrayAdapter<MyTask>(this, android.R.layout.simple_list_item_1);
-        MyTaskAdapter tasksAdapter=new MyTaskAdapter(getApplicationContext(),R.layout.task_item_layout);
-        lstTasks.setAdapter(tasksAdapter);
-
-        FirebaseFirestore ffRef = FirebaseFirestore.getInstance();
+        //בדיקה אם נחר נושא
         if(spnrSubject==null || spnrSubject.getSelectedItem()==null)
             return;
-        ffRef.collection("MyUsers").
-                document(FirebaseAuth.getInstance().getUid()).
-                collection("subjects").
-                document(spnrSubject.getSelectedItem().toString()).
-                collection("Tasks").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        for (DocumentSnapshot document : task.getResult().getDocuments()) {
-                            tasksAdapter.add(document.toObject(MyTask.class));
-                        }
-                    }
-                });
-
-//        ArrayAdapter<MyTask> taksAdapter=new ArrayAdapter<MyTask>(this, android.R.layout.simple_list_item_1);
-//        taksAdapter.addAll(allTasks);
-//        lstTasks.setAdapter(taksAdapter);
+        //בניית מתאם אם לא נבנה קודם
+        if(tasksAdapter==null)
+            tasksAdapter=new MyTaskAdapter(getApplicationContext(),R.layout.task_item_layout);
+        tasksAdapter.clear();//מחקית כל מה שיש במתאם
+        ArrayList<MyTask> tasks = readTaskFrom_FB();// קבלת מקור הנתונים ממסד הניתונים
+        tasksAdapter.addAll(tasks);//הוספת כל הנתונים למתאם
+        //הוספת מאזין לפתיחת תפריט בלחיצה על פריט מסוים
         lstTasks.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override                                                   //i رقم العنصر الذي سبب الحدث
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -169,6 +159,42 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     *  קריאת נתונים ממסד הנתונים firestore
+     * @return .... רשימת הנתונים שנקראה ממסד הנתונים
+     */
+    public ArrayList<MyTask> readTaskFrom_FB()
+    {
+        //בניית רשימה ריקה
+        ArrayList<MyTask> arrayList =new ArrayList<>();
+        //קבחת הפנייה למסד הנתונים
+        FirebaseFirestore ffRef = FirebaseFirestore.getInstance();
+        //קישור לקבוצה collection שרוצים לקרוא
+        ffRef.collection("MyUsers").
+                document(FirebaseAuth.getInstance().getUid()).
+                collection("subjects").
+                document(spnrSubject.getSelectedItem().toString()).
+                //הוספת מאזין לקריאת הנתוניחם
+                collection("Tasks").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    /**
+                     * תגובה לאירוע השלמת קריאת הנתונים
+                     * @param task הנתונים שהתקבלו מענן מסד הנתונים
+                     */
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if(task.isSuccessful())// אם בקשת הנתונים התקבלה בהצלחה
+                            //מעבר על כל ה״מסמכים״= עצמים והוספתם למבנה הנתונים
+                            for (DocumentSnapshot document : task.getResult().getDocuments()) {
+                                //המרת העצם לטיפוס שלו// הוספת העצם למבנה הנתונים
+                                arrayList.add(document.toObject(MyTask.class));
+                            }
+                        else{
+                            Toast.makeText(MainActivity.this, "Error Reading data"+task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+        return arrayList;
+    }
     private void realTimeUpdate_subjects()
     {
         FirebaseFirestore ffRef = FirebaseFirestore.getInstance();
