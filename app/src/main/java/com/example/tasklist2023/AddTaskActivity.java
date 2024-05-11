@@ -217,6 +217,7 @@ public class AddTaskActivity extends AppCompatActivity {
                     // קבלת מזהה למסמך החדש
                     String taskId = tasksCollection.document().getId();
                     myTask.id = taskId;//עידכון תכונת המזהה של המשימה
+                    myTask.sbjId=subject.title;
                     // הוספת (מסמך) המשימה לאוסף המשימות
                     //הוספת המאזין לבדיקת הצלחת ההוספה
                     tasksCollection.document(taskId).set(myTask).addOnCompleteListener(new OnCompleteListener<Void>() {

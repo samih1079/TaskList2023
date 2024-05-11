@@ -26,6 +26,7 @@ import androidx.annotation.Nullable;
 import com.example.tasklist2023.R;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -83,6 +84,7 @@ public class MyTaskAdapter extends ArrayAdapter<MyTask> {
             @Override
             public void onClick(View view) {
                 Toast.makeText(getContext(), "deleted", Toast.LENGTH_SHORT).show();
+                delteItem(current);
             }
         });
         btnCall.setOnClickListener(new View.OnClickListener() {
@@ -99,6 +101,12 @@ public class MyTaskAdapter extends ArrayAdapter<MyTask> {
         });
         return vitem;
 
+    }
+
+    private void delteItem(MyTask current) {
+//        FirebaseFirestore.getInstance().collection("MyUsers")
+//                .document(current.)
+//                .collection("subjects")
     }
 
     /**
@@ -141,7 +149,7 @@ public class MyTaskAdapter extends ArrayAdapter<MyTask> {
      * @param toView רכיב התמונה המיועד להצגת התמונה
      */
     private void downloadImageToLocalFile(String fileURL, final ImageView toView) {
-        ֿif(fileURL==null) return;// אם אין תמונה= כתובת ריקה אז לא עושים כלום מפסיקים את הפעולה
+        if(fileURL==null) return;// אם אין תמונה= כתובת ריקה אז לא עושים כלום מפסיקים את הפעולה
         // הפניה למיקום הקובץ באיחסון
         StorageReference httpsReference = FirebaseStorage.getInstance().getReferenceFromUrl(fileURL);
         final File localFile;
@@ -176,7 +184,7 @@ public class MyTaskAdapter extends ArrayAdapter<MyTask> {
      */
     private void downloadImageToMemory(String fileURL, final ImageView toView)
     {
-       ֿif(fileURL==null) return;// אם אין תמונה= כתובת ריקה אז לא עושים כלום מפסיקים את הפעולה
+        if(fileURL==null)return;
         // הפניה למיקום הקובץ באיחסון
         StorageReference httpsReference = FirebaseStorage.getInstance().getReferenceFromUrl(fileURL);
         final long ONE_MEGABYTE = 1024 * 1024;
