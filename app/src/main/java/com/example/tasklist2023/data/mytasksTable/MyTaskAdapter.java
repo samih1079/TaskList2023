@@ -116,25 +116,38 @@ public class MyTaskAdapter extends ArrayAdapter<MyTask> {
         getContext().startActivity(smsIntent);
     }
 
+    /**
+     * הצגת תמונה ישירות מהענן בעזרת המחלקה ״פיקאסו״
+     * @param imageUrL כתובת התמונה בענן/שרת
+     * @param toView רכיב תמונה המיועד להצגת התמונה אחרי ההורדה
+     */
     private void downloadImageUsingPicasso(String imageUrL, ImageView toView)
     {
+        // אם אין תמונה= כתובת ריקה אז לא עושים כלום מפסיקים את הפעולה
+        if(imageUrL==null) return;
         //todo: add dependency to module gradle:
         //    implementation 'com.squareup.picasso:picasso:2.5.2'
         Picasso.with(getContext())
-                .load(imageUrL)
+                .load(imageUrL)//הורדת התמונה לפי כתובת
                 .centerCrop()
-                .error(R.drawable.androidparty)
-                .resize(90,90)
-                .into(toView);
+                .error(R.drawable.androidparty)//התמונה שמוצגת אם יש בעיה בהורדת התמונה
+                .resize(90,90)//שינוי גודל התמונה
+                .into(toView);// להציג בריכיב התמונה המיועד לתמונה זו
     }
 
+    /**
+     * הורדת הקובץ/התמונה לאחסון מיקומי של הטלפון והגתה על רכיב תמונה
+     * @param fileURL כתובת הקובץ באחסון הענן
+     * @param toView רכיב התמונה המיועד להצגת התמונה
+     */
     private void downloadImageToLocalFile(String fileURL, final ImageView toView) {
+        ֿif(fileURL==null) return;// אם אין תמונה= כתובת ריקה אז לא עושים כלום מפסיקים את הפעולה
+        // הפניה למיקום הקובץ באיחסון
         StorageReference httpsReference = FirebaseStorage.getInstance().getReferenceFromUrl(fileURL);
         final File localFile;
-        try {
+        try {// יצירת קובץ מיקומי לפי שם וסוג קובץ
             localFile = File.createTempFile("images", "jpg");
-
-
+            //הורדת הקובץ והוספת מאיזין שבודק אם ההורדה הצליחה או לא
             httpsReference.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
@@ -142,6 +155,7 @@ public class MyTaskAdapter extends ArrayAdapter<MyTask> {
                     Toast.makeText(getContext(), "downloaded Image To Local File", Toast.LENGTH_SHORT).show();
                     toView.setImageURI(Uri.fromFile(localFile));
                 }
+                //מאזין אם ההורדה נכשלה
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception exception) {
@@ -154,10 +168,19 @@ public class MyTaskAdapter extends ArrayAdapter<MyTask> {
             e.printStackTrace();
         }
     }
+
+    /**
+     * הורדת קובץ/תמונה לזיכרון של הטלפון (לא לאחסון)
+     * @param fileURL כתובת הקובץ באחסון הענן
+     * @param toView רכיב התמונה המיועד להצגת התמונה
+     */
     private void downloadImageToMemory(String fileURL, final ImageView toView)
     {
+       ֿif(fileURL==null) return;// אם אין תמונה= כתובת ריקה אז לא עושים כלום מפסיקים את הפעולה
+        // הפניה למיקום הקובץ באיחסון
         StorageReference httpsReference = FirebaseStorage.getInstance().getReferenceFromUrl(fileURL);
         final long ONE_MEGABYTE = 1024 * 1024;
+        //הורדת הקובץ והוספת מאזין שבודק אם ההורדה הצליחה או לא
         httpsReference.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
             @Override
             public void onSuccess(byte[] bytes) {
@@ -168,6 +191,7 @@ public class MyTaskAdapter extends ArrayAdapter<MyTask> {
                 Toast.makeText(getContext(), "downloaded Image To Memory", Toast.LENGTH_SHORT).show();
 
             }
+            //מאזין אם ההורדה נכשלה
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception exception) {
@@ -180,8 +204,19 @@ public class MyTaskAdapter extends ArrayAdapter<MyTask> {
     }
 
 
+    /**
+     * מחיקת קובץ האיחסון הענן
+     * @param fileURL כתובת הקובץ המיועד למחיקה
+     */
     private void deleteFile(String fileURL) {
+        // אם אין תמונה= כתובת ריקה אז לא עושים כלום מפסיקים את הפעולה
+        if(fileURL==null){
+            Toast.makeText(getContext(), "Theres no file to delete!!!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        // הפניה למיקום הקובץ באיחסון
         StorageReference storageReference = FirebaseStorage.getInstance().getReferenceFromUrl(fileURL);
+        //מחיקת הקובץ והוספת מאזין שבודק אם ההורדה הצליחה או לא
         storageReference.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
@@ -189,6 +224,7 @@ public class MyTaskAdapter extends ArrayAdapter<MyTask> {
                 Toast.makeText(getContext(), "file deleted", Toast.LENGTH_SHORT).show();
                 Log.e("firebasestorage", "onSuccess: deleted file");
             }
+            //מאזין אם המחיקה נכשלה
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception exception) {
