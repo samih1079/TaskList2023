@@ -66,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         lstTasks=findViewById(R.id.lstvTasks);//הפניה לרכיב הגרפי שמציג אוסף
+
         tasksAdapter=new MyTaskAdapter(this,R.layout.task_item_layout);//בניית המתאם
         lstTasks.setAdapter(tasksAdapter);//קישור המתאם אם המציג הגרפי לאוסף
         fabAdd=findViewById(R.id.fabAdd);
@@ -145,13 +146,14 @@ public class MainActivity extends AppCompatActivity {
         if(spnrSubject==null || spnrSubject.getSelectedItem()==null)
             return;
         //בניית מתאם אם לא נבנה קודם
-        if(tasksAdapter==null)
-            tasksAdapter=new MyTaskAdapter(getApplicationContext(),R.layout.task_item_layout);
+        if(tasksAdapter==null) {
+            tasksAdapter = new MyTaskAdapter(getApplicationContext(), R.layout.task_item_layout);
+            lstTasks.setAdapter(tasksAdapter);
+        }
         tasksAdapter.clear();//מחקית כל מה שיש במתאם
-       readTaskFrom_FB();// קבלת מקור הנתונים ממסד הניתונים
-        //הוספת כל הנתונים למתאם
+       readTaskFrom_FB();// הורדת ניתונים והוספתם למתאם
         //הוספת מאזין לפתיחת תפריט בלחיצה על פריט מסוים
-        lstTasks.setAdapter(tasksAdapter);
+
         lstTasks.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override                                                   //i رقم العنصر الذي سبب الحدث
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -189,7 +191,7 @@ public class MainActivity extends AppCompatActivity {
                                 //המרת העצם לטיפוס שלו// הוספת העצם למבנה הנתונים
                                 arrayList.add(document.toObject(MyTask.class));
                             }
-                          tasksAdapter.clear();
+                            tasksAdapter.clear();
                             tasksAdapter.addAll(arrayList);
                         }
                         else{
