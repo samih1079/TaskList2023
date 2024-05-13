@@ -148,9 +148,10 @@ public class MainActivity extends AppCompatActivity {
         if(tasksAdapter==null)
             tasksAdapter=new MyTaskAdapter(getApplicationContext(),R.layout.task_item_layout);
         tasksAdapter.clear();//מחקית כל מה שיש במתאם
-        ArrayList<MyTask> tasks = readTaskFrom_FB();// קבלת מקור הנתונים ממסד הניתונים
-        tasksAdapter.addAll(tasks);//הוספת כל הנתונים למתאם
+       readTaskFrom_FB();// קבלת מקור הנתונים ממסד הניתונים
+        //הוספת כל הנתונים למתאם
         //הוספת מאזין לפתיחת תפריט בלחיצה על פריט מסוים
+        lstTasks.setAdapter(tasksAdapter);
         lstTasks.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override                                                   //i رقم العنصر الذي سبب الحدث
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -163,7 +164,7 @@ public class MainActivity extends AppCompatActivity {
      *  קריאת נתונים ממסד הנתונים firestore
      * @return .... רשימת הנתונים שנקראה ממסד הנתונים
      */
-    public ArrayList<MyTask> readTaskFrom_FB()
+    public void readTaskFrom_FB()
     {
         //בניית רשימה ריקה
         ArrayList<MyTask> arrayList =new ArrayList<>();
@@ -182,18 +183,20 @@ public class MainActivity extends AppCompatActivity {
                      */
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if(task.isSuccessful())// אם בקשת הנתונים התקבלה בהצלחה
+                        if(task.isSuccessful()) {// אם בקשת הנתונים התקבלה בהצלחה
                             //מעבר על כל ה״מסמכים״= עצמים והוספתם למבנה הנתונים
                             for (DocumentSnapshot document : task.getResult().getDocuments()) {
                                 //המרת העצם לטיפוס שלו// הוספת העצם למבנה הנתונים
                                 arrayList.add(document.toObject(MyTask.class));
                             }
+                          tasksAdapter.clear();
+                            tasksAdapter.addAll(arrayList);
+                        }
                         else{
                             Toast.makeText(MainActivity.this, "Error Reading data"+task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
-        return arrayList;
     }
     private void realTimeUpdate_subjects()
     {

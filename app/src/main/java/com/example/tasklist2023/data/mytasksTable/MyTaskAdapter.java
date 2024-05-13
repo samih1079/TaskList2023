@@ -61,9 +61,9 @@ public class MyTaskAdapter extends ArrayAdapter<MyTask> {
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
         //בניית הפריט הגרפי מתו קובץ העיצוב
-        View vitem= convertView;
+        View vitem=convertView;
         if(vitem==null)
-              vitem=LayoutInflater.from(getContext()).inflate(itemLayout,parent,false);
+         vitem=convertView=LayoutInflater.from(getContext()).inflate(itemLayout,parent,false);
         //קבלת הפניות לרכיבים בקובץ העיצוב
         ImageView imageView=vitem.findViewById(R.id.imgVitm);
         TextView tvTitle=vitem.findViewById(R.id.tvItmTitle);
