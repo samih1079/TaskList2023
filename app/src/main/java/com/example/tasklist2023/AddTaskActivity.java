@@ -325,7 +325,7 @@ public class AddTaskActivity extends AppCompatActivity {
     private void checkPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {//בדיקת גרסאות
             //בדיקה אם ההשאה לא אושרה בעבר
-            if (checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
+            if (checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED ) {
                 //רשימת ההרשאות שרוצים לבקש אישור
                 String[] permissions = {android.Manifest.permission.READ_EXTERNAL_STORAGE};
                 //בקשת אישור ההשאות (שולחים קוד הבקשה)

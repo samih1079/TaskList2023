@@ -5,11 +5,14 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -55,6 +58,7 @@ import java.util.List;
  * מסך ראשי מציג כל המטלות עם אפשרות חיפוש והוספה
  */
 public class MainActivity extends AppCompatActivity {
+    private static final int PERMISSION_CODE = 100;
     //spnr1 تعريف صفة للكائن المرئي
     private Spinner spnrSubject;
     private FloatingActionButton fabAdd;
@@ -69,6 +73,13 @@ public class MainActivity extends AppCompatActivity {
 
         tasksAdapter=new MyTaskAdapter(this,R.layout.task_item_layout);//בניית המתאם
         lstTasks.setAdapter(tasksAdapter);//קישור המתאם אם המציג הגרפי לאוסף
+        //הוספת מאזין לפתיחת תפריט בלחיצה על פריט מסוים
+        lstTasks.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override                                                   //i رقم العنصر الذي سبب الحدث
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                showPopUpMenu(view, tasksAdapter.getItem(i)); //i رقم العنصر الذي سبب الحدث
+            }
+        });
         fabAdd=findViewById(R.id.fabAdd);
         fabAdd.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -80,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
         //spnr2 وضع مؤشر الصفة على الكائن المرئي الموجود بواجهة المستعمل
        spnrSubject = findViewById(R.id.spnrSubject);
         initSubjectSpnr_FB();
-        initAllListView_FB();
+
         //realTimeUpdate_subjects();
 
 
@@ -138,29 +149,21 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-    /**
-     * تجهيز قائمة جميع المهمات وعرضها ب ListView
-     */
-    private void initAllListView_FB() {
-        //בדיקה אם נחר נושא
-        if(spnrSubject==null || spnrSubject.getSelectedItem()==null)
-            return;
-        //בניית מתאם אם לא נבנה קודם
-        if(tasksAdapter==null) {
-            tasksAdapter = new MyTaskAdapter(getApplicationContext(), R.layout.task_item_layout);
-            lstTasks.setAdapter(tasksAdapter);
-        }
-        tasksAdapter.clear();//מחקית כל מה שיש במתאם
-       readTaskFrom_FB();// הורדת ניתונים והוספתם למתאם
-        //הוספת מאזין לפתיחת תפריט בלחיצה על פריט מסוים
-
-        lstTasks.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override                                                   //i رقم العنصر الذي سبب الحدث
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                showPopUpMenu(view, tasksAdapter.getItem(i)); //i رقم العنصر الذي سبب الحدث
-            }
-        });
-    }
+//    /**
+//     * تجهيز قائمة جميع المهمات وعرضها ب ListView
+//     */
+//    private void initAllListView_FB() {
+//        //בדיקה אם נחר נושא
+//        if(spnrSubject==null || spnrSubject.getSelectedItem()==null)
+//            return;
+//        //בניית מתאם אם לא נבנה קודם
+//        if(tasksAdapter==null) {
+//            tasksAdapter = new MyTaskAdapter(getApplicationContext(), R.layout.task_item_layout);
+//            lstTasks.setAdapter(tasksAdapter);
+//        }
+//       readTaskFrom_FB();// הורדת ניתונים והוספתם למתאם
+//
+//    }
 
     /**
      *  קריאת נתונים ממסד הנתונים firestore
@@ -191,8 +194,8 @@ public class MainActivity extends AppCompatActivity {
                                 //המרת העצם לטיפוס שלו// הוספת העצם למבנה הנתונים
                                 arrayList.add(document.toObject(MyTask.class));
                             }
-                            tasksAdapter.clear();
-                            tasksAdapter.addAll(arrayList);
+                            tasksAdapter.clear();//ניקוי המתאם מכל הנתונים
+                            tasksAdapter.addAll(arrayList);//הוספת כל הנתונים למתאם
                         }
                         else{
                             Toast.makeText(MainActivity.this, "Error Reading data"+task.getException().getMessage(), Toast.LENGTH_SHORT).show();
@@ -284,7 +287,7 @@ public class MainActivity extends AppCompatActivity {
                     subjectAdapter.add(mySubject.getTitle());
                 }
                 spnrSubject.setAdapter(subjectAdapter);//ربط السبنر بالوسيط
-                initAllListView_FB();
+                readTaskFrom_FB();
 
             }
         });
@@ -294,7 +297,7 @@ public class MainActivity extends AppCompatActivity {
         spnrSubject.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                initAllListView_FB();
+                readTaskFrom_FB();
 //                //استخراج الموضوع حسب رقمه الترتيبي i
 //                String item = subjectAdapter.getItem(i);
 //                if(item.equals("ALL"))//هذه يعني عرض جميع المهام
@@ -369,7 +372,7 @@ public class MainActivity extends AppCompatActivity {
                                 public void onComplete(@NonNull Task<Void> task) {
                                     if(task.isSuccessful())
                                     {
-                                        initAllListView_FB();
+                                        readTaskFrom_FB();
                                         Toast.makeText(MainActivity.this, "deleted", Toast.LENGTH_SHORT).show();
                                     }
                                 }
@@ -536,6 +539,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
+    private void checkPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {//בדיקת גרסאות
+            //בדיקה אם ההשאה לא אושרה בעבר
+            if (checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED ||
+                    checkSelfPermission(Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_DENIED) {
+                //רשימת ההרשאות שרוצים לבקש אישור
+                String[] permissions = {android.Manifest.permission.READ_EXTERNAL_STORAGE};
+                //בקשת אישור ההשאות (שולחים קוד הבקשה)
+                //התשובה תתקבל בפעולה onRequestPermissionsResult
+                requestPermissions(permissions, PERMISSION_CODE);
+            }
+        }
+    }
 
 }

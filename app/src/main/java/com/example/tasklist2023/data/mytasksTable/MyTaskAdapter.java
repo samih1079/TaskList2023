@@ -2,31 +2,34 @@ package com.example.tasklist2023.data.mytasksTable;
 
 
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
-import static androidx.core.content.ContextCompat.startActivity;
 
+import static androidx.core.app.ActivityCompat.requestPermissions;
+import static androidx.core.content.PermissionChecker.checkSelfPermission;
+
+import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Build;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.PermissionChecker;
 
 import com.example.tasklist2023.R;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -34,6 +37,8 @@ import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 
 /**
  * אוסף ניתונים ומתאם בין הניתונים לרכיב גרפי שמציג אוסף ניתונים
@@ -79,7 +84,16 @@ public class MyTaskAdapter extends ArrayAdapter<MyTask> {
         tvTitle.setText(current.getShortTitle());
         tvText.setText(current.getText());
         tvImportance.setText("Importance:"+current.getImportance());
+        btnSendSMS.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+               // openSendSmsApp(current.getText(),"");
+                openSendWhatsAppV2(current.getText(),"");
+            }
+        });
 
+
+        downloadImageUsingPicasso(current.getImage(),imageView);
         btnDel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -90,15 +104,10 @@ public class MyTaskAdapter extends ArrayAdapter<MyTask> {
         btnCall.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                callAPhoneNymber(current.getText());
+            }
+        });
 
-            }
-        });
-        btnSendSMS.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-               openSendSmsApp(current.getText(),"");
-            }
-        });
         return vitem;
 
     }
@@ -116,12 +125,89 @@ public class MyTaskAdapter extends ArrayAdapter<MyTask> {
      */
     public void openSendSmsApp(String msg, String phone)
     {
+        //אינטנט מרומז לפתיחת אפליקצית ההודות סמס
         Intent smsIntent = new Intent(Intent.ACTION_SENDTO);
+        //מעבירים מספר הטלפון
         smsIntent.setData(Uri.parse("smsto:"+phone));
+        //ההודעה שנרצה שתופיע באפליקצית ה סמס
+        smsIntent.putExtra("sms_body",msg);
         smsIntent.addFlags(FLAG_ACTIVITY_NEW_TASK);
         smsIntent.addCategory(Intent.CATEGORY_DEFAULT);
-        smsIntent.putExtra("sms_body",msg);
+        //פתיחת אפליקציית ה סמס
         getContext().startActivity(smsIntent);
+    }
+    /**
+     *  פתיחת אפליקצית שליחת whatsapp
+     * @param msg .. ההודעה שרוצים לשלוח
+     * @param phone
+     */
+    public void openSendWhatsAppV1(String msg, String phone)
+    {
+        //אינטנט מרומז לפתיחת אפליקצית ההודות סמס
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        //מעבירים מספר הטלפון
+       // sendIntent.setData(Uri.parse("smsto:"+phone));
+        //ההודעה שנרצה שתופיע באפליקצית ה סמס
+        sendIntent.putExtra(Intent.EXTRA_TEXT, msg);
+        sendIntent.setPackage("com.whatsapp");
+        sendIntent.setType("text/plain");
+        sendIntent.addFlags(FLAG_ACTIVITY_NEW_TASK);
+        sendIntent.addCategory(Intent.CATEGORY_DEFAULT);
+        //פתיחת אפליקציית ה סמס
+        getContext().startActivity(sendIntent);
+    }
+    /**
+     *  פתיחת אפליקצית שליחת whatsapp
+     * @param msg .. ההודעה שרוצים לשלוח
+     * @param phone
+     */
+    public void openSendWhatsAppV2(String msg, String phone)
+    {
+        //אינטנט מרומז לפתיחת אפליקצית ההודות סמס
+        Intent sendIntent = new Intent(Intent.ACTION_VIEW);;
+        String url = null;
+        try {
+            url = "https://api.whatsapp.com/send?phone="+phone+"&text="+ URLEncoder.encode(msg, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            //throw new RuntimeException(e);
+            e.printStackTrace();
+            Toast.makeText(getContext(), "there is no whatsapp!!", Toast.LENGTH_SHORT).show();
+        }
+        sendIntent.setData(Uri.parse(url));
+        sendIntent.addFlags(FLAG_ACTIVITY_NEW_TASK);
+        sendIntent.addCategory(Intent.CATEGORY_DEFAULT);
+        //פתיחת אפליקציית ה סמס
+        getContext().startActivity(sendIntent);
+    }
+
+    /**
+     * ביצוע שיחה למפסר טלפון
+     * todo הוספת הרשאה בקובץ המניפיסט
+     * <uses-permission android:name="android.permission.CALL_PHONE" />
+     * @param phone מספר טלפון שרוצים להתקשר אליו
+     */
+    private void callAPhoneNymber(String phone)
+    {
+        //בדיקה אם יש הרשאה לביצוע שיחה
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {//בדיקת גרסאות
+            //בדיקה אם ההשאה לא אושרה בעבר
+            if (checkSelfPermission(getContext(),Manifest.permission.CALL_PHONE) == PermissionChecker.PERMISSION_DENIED) {
+                //רשימת ההרשאות שרוצים לבקש אישור
+                String[] permissions = {Manifest.permission.CALL_PHONE};
+                //בקשת אישור הרשאות (שולחים קוד הבקשה)
+                //התשובה תתקבל בפעולה onRequestPermissionsResult
+                requestPermissions((Activity) getContext(),permissions, 100);
+            }
+            else
+            {
+                //אינטנט מרומז לפתיחת אפליקצית ההודות סמס
+                Intent phone_intent = new Intent(Intent.ACTION_CALL);
+                phone_intent.setData(Uri.parse("tel:" + phone));
+                getContext().startActivity(phone_intent);
+            }
+        }
+
     }
 
     /**
@@ -243,5 +329,18 @@ public class MyTaskAdapter extends ArrayAdapter<MyTask> {
                 exception.printStackTrace();
             }
         });
+    }
+
+    private void checkCallPhonePermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {//בדיקת גרסאות
+            //בדיקה אם ההשאה לא אושרה בעבר
+            if (checkSelfPermission(getContext(),Manifest.permission.CALL_PHONE) == PermissionChecker.PERMISSION_DENIED) {
+                //רשימת ההרשאות שרוצים לבקש אישור
+                String[] permissions = {Manifest.permission.CALL_PHONE};
+                //בקשת אישור ההשאות (שולחים קוד הבקשה)
+                //התשובה תתקבל בפעולה onRequestPermissionsResult
+                requestPermissions((Activity) getContext(),permissions, 100);
+            }
+        }
     }
 }
