@@ -27,9 +27,14 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.PermissionChecker;
 
+import com.example.tasklist2023.MainActivity;
 import com.example.tasklist2023.R;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -98,7 +103,7 @@ public class MyTaskAdapter extends ArrayAdapter<MyTask> {
             @Override
             public void onClick(View view) {
                 Toast.makeText(getContext(), "deleted", Toast.LENGTH_SHORT).show();
-                delteItem(current);
+                delMyTaskFromDB_FB(current);
             }
         });
         btnCall.setOnClickListener(new View.OnClickListener() {
@@ -112,11 +117,7 @@ public class MyTaskAdapter extends ArrayAdapter<MyTask> {
 
     }
 
-    private void delteItem(MyTask current) {
-//        FirebaseFirestore.getInstance().collection("MyUsers")
-//                .document(current.)
-//                .collection("subjects")
-    }
+
 
     /**
      *  פתיחת אפליקצית שליחת sms
@@ -297,6 +298,32 @@ public class MyTaskAdapter extends ArrayAdapter<MyTask> {
 
     }
 
+    /**
+     * מחיקת פריט כולל התמונה מבסיס הנתונים
+     * @param myTask הפריט שמוחקים
+     */
+    private void delMyTaskFromDB_FB(MyTask myTask)
+    {
+        //הפנייה/כתובת  הפריט שרוצים למחוק
+        FirebaseFirestore db=FirebaseFirestore.getInstance();
+        db.collection("MyUsers").
+                document(FirebaseAuth.getInstance().getUid()).
+                collection("subjects").
+                document(myTask.sbjId).
+                collection("Tasks").document(myTask.id).
+                delete().//מאזין אם המחיקה בוצעה
+                addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if(task.isSuccessful())
+                        {
+                            remove(myTask);// מוחקים מהמתאם
+                            deleteFile(myTask.getImage());// מחיקת הקובץ
+                            Toast.makeText(getContext(), "deleted", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+    }
 
     /**
      * מחיקת קובץ האיחסון הענן
@@ -311,24 +338,18 @@ public class MyTaskAdapter extends ArrayAdapter<MyTask> {
         // הפניה למיקום הקובץ באיחסון
         StorageReference storageReference = FirebaseStorage.getInstance().getReferenceFromUrl(fileURL);
         //מחיקת הקובץ והוספת מאזין שבודק אם ההורדה הצליחה או לא
-        storageReference.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void aVoid) {
-                // File deleted successfully
-                Toast.makeText(getContext(), "file deleted", Toast.LENGTH_SHORT).show();
-                Log.e("firebasestorage", "onSuccess: deleted file");
-            }
-            //מאזין אם המחיקה נכשלה
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception exception) {
-                // Uh-oh, an error occurred!
-                Toast.makeText(getContext(), "onFailure: did not delete file "+exception.getMessage(), Toast.LENGTH_SHORT).show();
-
-                Log.e("firebasestorage", "onFailure: did not delete file"+exception.getMessage());
-                exception.printStackTrace();
-            }
-        });
+      storageReference.delete().addOnCompleteListener(new OnCompleteListener<Void>() {
+          @Override
+          public void onComplete(@NonNull Task<Void> task) {
+              if(task.isSuccessful())
+              {
+                  Toast.makeText(getContext(), "file deleted", Toast.LENGTH_SHORT).show();
+              }
+              else {
+                  Toast.makeText(getContext(), "onFailure: did not delete file "+task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+              }
+          }
+      });
     }
 
     private void checkCallPhonePermission() {
@@ -343,4 +364,6 @@ public class MyTaskAdapter extends ArrayAdapter<MyTask> {
             }
         }
     }
+
+
 }

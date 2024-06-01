@@ -25,6 +25,8 @@ public class SignUpActivity extends AppCompatActivity {
     private Button btnSave, btnCancel;
     private TextInputEditText etName, etEmail,
             etPassword, etRePassword, etPhone;
+    //بناء الكائن الذي سيتم حفظه
+    MyUser user=new MyUser();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -153,8 +155,7 @@ public class SignUpActivity extends AppCompatActivity {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         //استخراج الرقم المميز للمستعمل الذي سجل الدخول
         String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        //بناء الكائن الذي سيتم حفظه
-        MyUser user=new MyUser();
+
         user.setEmail(email);
         user.setFullName(name);
         user.setPhone(phone);

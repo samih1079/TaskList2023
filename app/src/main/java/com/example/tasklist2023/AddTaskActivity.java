@@ -1,14 +1,20 @@
 package com.example.tasklist2023;
 
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.ContactsContract;
+import android.provider.MediaStore;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -16,6 +22,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.Toast;
+import android.widget.VideoView;
 
 import com.example.tasklist2023.data.AppDataBase;
 import com.example.tasklist2023.data.mySubjectsTable.MySubject;
@@ -35,6 +42,7 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
 import com.google.firebase.storage.UploadTask;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -65,16 +73,23 @@ public class AddTaskActivity extends AppCompatActivity {
 
     //upload: 1 add Xml image view or button and upload button
     //upload: 2 add next fileds
-    private final int IMAGE_PICK_CODE = 100;// קוד מזהה לבקשת בחירת תמונה
     private final int PERMISSION_CODE = 101;//קוד מזהה לבחירת הרשאת גישה לקבצים
+    private static final int REQUEST_CONTACT_PICKER = 102;//קוד בקשת בחירת איש קשר מהטלפון
+    private Button btnPickContact;//בחירת איש קשר מאנשי הקשר
+
+    private final int IMAGE_PICK_CODE = 100;// קוד מזהה לבקשת בחירת תמונה
     /**
      * הצכת ובחירת תמונה
      */
     private ImageButton imgBtnl;//כפתור/ לחצן לבחירת תמונה והצגתה
-    private Button btnUpload;// לחצן לביצוע העלאת התמונה
     private Uri toUploadimageUri;// כתוב הקובץ(תמונה) שרוצים להעלות
     private Uri downladuri;//כתובת הקוץ בענן אחרי ההעלאה
-    StorageTask uploadTask;// עצם לביצוע ההעלאה
+
+    private VideoView vidV;
+    private final int Video_PICK_CODE = 103;// קוד מזהה לבקשת בחירת תמונה
+
+    private Uri toUploadVideoUri;// כתוב הקובץ(תמונה) שרוצים להעלות
+    private Uri downladVideoUri;//כתובת הקוץ בענן אחרי ההעלאה
     private MySubject subject;
     private MyTask myTask;
 
@@ -89,6 +104,28 @@ public class AddTaskActivity extends AppCompatActivity {
         sbImportance = findViewById(R.id.skbrImportance);
         btnSave = findViewById(R.id.btnSaveTask);
         btnCancel = findViewById(R.id.btnCancelTask);
+        btnPickContact=findViewById(R.id.btnPickContact);
+        btnPickContact.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                if(checkSelfPermission(android.Manifest.permission.READ_CONTACTS)==PackageManager.PERMISSION_DENIED)
+                {
+                    String[] permissions = {Manifest.permission.READ_CONTACTS};
+                    //בקשת אישור ההשאות (שולחים קוד הבקשה)
+                    //התשובה תתקבל בפעולה onRequestPermissionsResult
+                    requestPermissions(permissions, 103);
+                }
+                else {
+                    // 3. Create an intent to pick a contact
+                    Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
+                    intent.setType(ContactsContract.CommonDataKinds.Phone.CONTENT_TYPE);
+
+                    // 4. Start activity for result, passing permission request code (if needed)
+                    startActivityForResult(intent, REQUEST_CONTACT_PICKER); // Replace with your request code
+                }
+            }
+        });
         //upload: 3
         imgBtnl = findViewById(R.id.imgBtn);
         imgBtnl.setOnClickListener(new View.OnClickListener() {
@@ -98,6 +135,15 @@ public class AddTaskActivity extends AppCompatActivity {
                 checkPermission();
             }
         });
+
+        vidV=findViewById(R.id.vidV);
+        vidV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                checkPermissionForVideo();
+            }
+        });
+
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -106,6 +152,8 @@ public class AddTaskActivity extends AppCompatActivity {
             }
         });
     }
+
+
 
     /**
      * استخراج اسماء المواضيع من جدول المواضيع وعرضه بالحقل من نوع
@@ -300,6 +348,12 @@ public class AddTaskActivity extends AppCompatActivity {
         intent.setType("image/*");
         startActivityForResult(intent, IMAGE_PICK_CODE);
     }
+    private void pickVideoFromGallery() {
+        //intent to pick image
+        Intent pickIntent = new Intent(Intent.ACTION_PICK, MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
+        pickIntent.setType("video/*");
+        startActivityForResult(pickIntent, Video_PICK_CODE);
+    }
     //upload: 5:handle result of picked images
 
     /**
@@ -307,6 +361,7 @@ public class AddTaskActivity extends AppCompatActivity {
      * @param resultCode  תוצאה הבקשה (אם נבחר משהו או בוטלה)
      * @param data        הנתונים שניבחרו
      */
+    @SuppressLint("Range")
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -316,7 +371,81 @@ public class AddTaskActivity extends AppCompatActivity {
             toUploadimageUri = data.getData();//קבלת כתובת התמונה הנתונים שניבחרו
             imgBtnl.setImageURI(toUploadimageUri);// הצגת התמונה שנבחרה על רכיב התמונה
         }
+        if (resultCode == RESULT_OK && requestCode == Video_PICK_CODE) {
+            //set image to image view
+            toUploadVideoUri = data.getData();//קבלת כתובת התמונה הנתונים שניבחרו
+            vidV.setVideoURI(toUploadVideoUri);// הצגת התמונה שנבחרה על רכיב התמונה
+            vidV.seekTo(2);
+        }
+        if(resultCode==RESULT_OK && requestCode==REQUEST_CONTACT_PICKER) {
+            etShortTitle.setText("");
+
+            Cursor cursor1, cursor2;
+
+            //get data from intent
+            Uri uri = data.getData();
+
+            cursor1 = getContentResolver().query(uri, null, null, null, null);
+
+            if (cursor1.moveToFirst()){
+                //get contact details
+                String contactId = cursor1.getString(cursor1.getColumnIndex(ContactsContract.Contacts._ID));
+                String contactName = cursor1.getString(cursor1.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
+                String contactThumnail = cursor1.getString(cursor1.getColumnIndex(ContactsContract.Contacts.PHOTO_THUMBNAIL_URI));
+                String idResults = cursor1.getString(cursor1.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER));
+                int idResultHold = Integer.parseInt(idResults);
+
+                etShortTitle.append("ID: "+contactId);
+                etShortTitle.append("\nName: "+contactName);
+
+                if (idResultHold == 1){
+                    cursor2 = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                            null,
+                            ContactsContract.CommonDataKinds.Phone.CONTACT_ID +" = "+contactId,
+                            null,
+                            null
+                    );
+                    //a contact may have multiple phone numbers
+                    while (cursor2.moveToNext()){
+                        //get phone number
+                        String contactNumber = cursor2.getString(cursor2.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                        //set details
+
+                        etShortTitle.append("\nPhone: "+contactNumber);
+                        //before setting image, check if have or not
+                        if (contactThumnail != null){
+                            imgBtnl.setImageURI(Uri.parse(contactThumnail));
+                        }
+                        else {
+                            //im.setImageResource(R.drawable.ic_person);
+                        }
+                    }
+                    cursor2.close();
+                }
+                cursor1.close();
+            }
+        }
     }
+
+    // Helper methods to retrieve phone numbers and emails
+    private List<String> getPhoneNumbers(String contactId) {
+        List<String> phoneNumbers = new ArrayList<>();
+        Cursor phoneCursor = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                null, ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?",
+                new String[]{contactId}, null);
+        if (phoneCursor != null) {
+            try {
+                while (phoneCursor.moveToNext()) {
+                    @SuppressLint("Range") String phoneNumber = phoneCursor.getString(phoneCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                    phoneNumbers.add(phoneNumber);
+                }
+            } finally {
+                phoneCursor.close();
+            }
+        }
+        return phoneNumbers;
+    }
+
     //upload: 6
 
     /**
@@ -325,9 +454,12 @@ public class AddTaskActivity extends AppCompatActivity {
     private void checkPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {//בדיקת גרסאות
             //בדיקה אם ההשאה לא אושרה בעבר
-            if (checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED ) {
+            if (checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED &&
+                    checkSelfPermission(Manifest.permission.READ_MEDIA_VIDEO) == PackageManager.PERMISSION_DENIED&&
+                    checkSelfPermission(Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_DENIED) {
                 //רשימת ההרשאות שרוצים לבקש אישור
-                String[] permissions = {android.Manifest.permission.READ_EXTERNAL_STORAGE};
+                String[] permissions = {android.Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.READ_MEDIA_VIDEO,Manifest.permission.READ_MEDIA_IMAGES};
+
                 //בקשת אישור ההשאות (שולחים קוד הבקשה)
                 //התשובה תתקבל בפעולה onRequestPermissionsResult
                 requestPermissions(permissions, PERMISSION_CODE);
@@ -351,7 +483,7 @@ public class AddTaskActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == PERMISSION_CODE) {//בדיקת קוד בקשת ההרשאה
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            if (grantResults.length > 0 && (grantResults[0] == PackageManager.PERMISSION_GRANTED )) {
                 //permission was granted אם יש אישור
                 pickImageFromGallery();
             } else {
@@ -361,4 +493,25 @@ public class AddTaskActivity extends AppCompatActivity {
         }
 
     }
+
+    private void checkPermissionForVideo() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {//בדיקת גרסאות
+            //בדיקה אם ההשאה לא אושרה בעבר
+            if (checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED &&
+                    checkSelfPermission(Manifest.permission.READ_MEDIA_VIDEO) == PackageManager.PERMISSION_DENIED&&
+                    checkSelfPermission(Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_DENIED) {
+                //רשימת ההרשאות שרוצים לבקש אישור
+                String[] permissions = {android.Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.READ_MEDIA_VIDEO,Manifest.permission.READ_MEDIA_IMAGES};
+                //בקשת אישור ההשאות (שולחים קוד הבקשה)
+                //התשובה תתקבל בפעולה onRequestPermissionsResult
+                requestPermissions(permissions, PERMISSION_CODE);
+            } else {
+                //permission already granted אם יש הרשאה מקודם אז מפעילים בחירת תמונה מהטלפון
+                pickVideoFromGallery();
+            }
+        } else {//אם גרסה ישנה ולא צריך קבלת אישור
+            pickVideoFromGallery();
+        }
+    }
+
 }

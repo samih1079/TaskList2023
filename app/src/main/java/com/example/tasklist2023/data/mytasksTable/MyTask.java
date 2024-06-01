@@ -36,26 +36,6 @@ public class MyTask
     //عنوان الصورة
     private String image;
 
-    @Override
-    public String toString() {
-        return "MyTask{" +
-                "keyId=" + keyId +
-                ", importance=" + importance +
-                ", text='" + text + '\'' +
-                ", time=" + time +
-                ", isCompleted=" + isCompleted +
-                ", subjId=" + subjId +
-                ", userId=" + userId +
-                '}';
-    }
-
-    public void setImage(String image) {
-        this.image = image;
-    }
-
-    public String getImage() {
-        return image;
-    }
 
     public String getId() {
         return id;
@@ -135,5 +115,30 @@ public class MyTask
 
     public void setUserId(long userId) {
         this.userId = userId;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
+    @Override
+    public String toString() {
+        return "MyTask{" +
+                "id='" + id + '\'' +
+                ", sbjId='" + sbjId + '\'' +
+                ", keyId=" + keyId +
+                ", importance=" + importance +
+                ", shortTitle='" + shortTitle + '\'' +
+                ", text='" + text + '\'' +
+                ", time=" + time +
+                ", isCompleted=" + isCompleted +
+                ", subjId=" + subjId +
+                ", userId=" + userId +
+                ", image='" + image + '\'' +
+                '}';
     }
 }

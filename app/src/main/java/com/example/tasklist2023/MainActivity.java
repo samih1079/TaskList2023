@@ -411,10 +411,24 @@ public class MainActivity extends AppCompatActivity {
     {      //فحص العنصر الذي سبب الحدث حسب ال id
         if(item.getItemId()==R.id.mnSettings)
         {
+            Toast.makeText(this, "Settingds", Toast.LENGTH_SHORT).show();
         }
         if(item.getItemId()==R.id.mnLogout)
         {
             showYesNoDialog();
+        }
+        if(item.getItemId()==R.id.mnPlayMusic)
+        {
+            Toast.makeText(this, "Play  music", Toast.LENGTH_SHORT).show();
+            Intent serviceIntn=new Intent(getApplicationContext(),MyAudioPlayerService.class);
+            startService(serviceIntn);
+
+        }
+        if(item.getItemId()==R.id.mnStopMusic)
+        {
+            Toast.makeText(this, "Stop Music", Toast.LENGTH_SHORT).show();
+            Intent serviceIntn=new Intent(getApplicationContext(),MyAudioPlayerService.class);
+            stopService(serviceIntn);
         }
         return true;
     }
@@ -552,5 +566,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
 
 }
