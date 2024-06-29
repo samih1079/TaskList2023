@@ -23,6 +23,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.PopupMenu;
+import android.widget.SearchView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -65,13 +66,16 @@ public class MainActivity extends AppCompatActivity {
     private ListView lstTasks;
     private MyTaskAdapter tasksAdapter;
 
+    private SearchView sv;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         lstTasks=findViewById(R.id.lstvTasks);//הפניה לרכיב הגרפי שמציג אוסף
-
+        sv=findViewById(R.id.srchV);
         tasksAdapter=new MyTaskAdapter(this,R.layout.task_item_layout);//בניית המתאם
+
         lstTasks.setAdapter(tasksAdapter);//קישור המתאם אם המציג הגרפי לאוסף
         //הוספת מאזין לפתיחת תפריט בלחיצה על פריט מסוים
         lstTasks.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -91,7 +95,18 @@ public class MainActivity extends AppCompatActivity {
         //spnr2 وضع مؤشر الصفة على الكائن المرئي الموجود بواجهة المستعمل
        spnrSubject = findViewById(R.id.spnrSubject);
         initSubjectSpnr_FB();
+        sv.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String s) {
+                return false;
+            }
 
+            @Override
+            public boolean onQueryTextChange(String s) {
+                tasksAdapter.getFilter().filter(s);
+                return true;
+            }
+        });
         //realTimeUpdate_subjects();
 
 
@@ -171,6 +186,7 @@ public class MainActivity extends AppCompatActivity {
      */
     public void readTaskFrom_FB()
     {
+        if(spnrSubject.getSelectedItem()==null)return;;
         //בניית רשימה ריקה
         ArrayList<MyTask> arrayList =new ArrayList<>();
         //קבחת הפנייה למסד הנתונים
@@ -297,7 +313,7 @@ public class MainActivity extends AppCompatActivity {
         spnrSubject.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                readTaskFrom_FB();
+              //  readTaskFrom_FB();
 //                //استخراج الموضوع حسب رقمه الترتيبي i
 //                String item = subjectAdapter.getItem(i);
 //                if(item.equals("ALL"))//هذه يعني عرض جميع المهام

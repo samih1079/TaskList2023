@@ -1,5 +1,4 @@
 <project version="4">
-  <component name="ExternalStorageConfigurationManager" enabled="true" />
   <component name="JavadocGenerationManager">
     <option name="OUTPUT_DIRECTORY" value="$USER_HOME$/Downloads/taskmngrDocs" />
   </component>

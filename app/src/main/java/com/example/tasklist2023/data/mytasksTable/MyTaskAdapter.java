@@ -19,6 +19,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Filter;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -44,6 +45,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * אוסף ניתונים ומתאם בין הניתונים לרכיב גרפי שמציג אוסף ניתונים
@@ -51,6 +54,8 @@ import java.net.URLEncoder;
 public class MyTaskAdapter extends ArrayAdapter<MyTask> {
     //המזהה של קובץ עיצוב הפריט
     private final int itemLayout;
+    private MyFilter myfilter;
+
     /**
      * פעולה בונה מתאם
      * @param context קישור להקשר (מסך- אקטיביטי)
@@ -365,5 +370,34 @@ public class MyTaskAdapter extends ArrayAdapter<MyTask> {
         }
     }
 
+    @NonNull
+    @Override
+    public Filter getFilter() {
+        if(myfilter==null)
+             myfilter=new MyFilter();
+        return myfilter;
+    }
+    class MyFilter extends Filter{
 
+        @Override
+        protected FilterResults performFiltering(CharSequence charSequence) {
+            FilterResults results = new FilterResults();
+            ArrayList<MyTask> filteredTasks=new ArrayList<>();
+
+            for (int i = 0; i < getCount(); i++) {
+                MyTask myTask = getItem(i);
+                if(myTask. toString().contains(charSequence))
+                    filteredTasks.add(myTask);
+            }
+            results.values=filteredTasks;
+            results.count=filteredTasks.size();
+            return results;
+        }
+
+        @Override
+        protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
+                            notifyDataSetChanged();
+
+        }
+    }
 }
