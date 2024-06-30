@@ -55,6 +55,11 @@ public class MyTaskAdapter extends ArrayAdapter<MyTask> {
     //המזהה של קובץ עיצוב הפריט
     private final int itemLayout;
     private MyFilter myfilter;
+    ArrayList<MyTask> orginal=new ArrayList<>();
+
+    public void setOrginal(ArrayList<MyTask> orginal) {
+        this.orginal = new ArrayList<>(orginal);
+    }
 
     /**
      * פעולה בונה מתאם
@@ -378,26 +383,41 @@ public class MyTaskAdapter extends ArrayAdapter<MyTask> {
         return myfilter;
     }
     class MyFilter extends Filter{
+                    ArrayList<MyTask> filteredTasks=new ArrayList<>();
 
         @Override
         protected FilterResults performFiltering(CharSequence charSequence) {
             FilterResults results = new FilterResults();
-            ArrayList<MyTask> filteredTasks=new ArrayList<>();
+            ArrayList<MyTask> temp=new ArrayList<>();
 
+             int countChanges=0;
             for (int i = 0; i < getCount(); i++) {
                 MyTask myTask = getItem(i);
-                if(myTask. toString().contains(charSequence))
-                    filteredTasks.add(myTask);
+                if(myTask. toString().toLowerCase().contains(charSequence.toString().toLowerCase()))
+                {
+                    countChanges++;
+                    temp.add(myTask);
+                }
             }
-            results.values=filteredTasks;
-            results.count=filteredTasks.size();
+            if(charSequence.length()>0 ) {
+                results.values = new ArrayList<>( temp);
+                results.count = temp.size();
+            }
+            else {
+                results.values = new ArrayList<>(orginal);
+                results.count = orginal.size();
+            }
             return results;
         }
 
         @Override
         protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
-                            notifyDataSetChanged();
+            filteredTasks= (ArrayList<MyTask>) filterResults.values;
+            clear();
+            addAll(new ArrayList<>(filteredTasks));
+            notifyDataSetChanged();
 
         }
     }
+
 }

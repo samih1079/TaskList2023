@@ -95,15 +95,24 @@ public class MainActivity extends AppCompatActivity {
         //spnr2 وضع مؤشر الصفة على الكائن المرئي الموجود بواجهة المستعمل
        spnrSubject = findViewById(R.id.spnrSubject);
         initSubjectSpnr_FB();
+        sv.setOnCloseListener(new SearchView.OnCloseListener() {
+            @Override
+            public boolean onClose() {
+                readTaskFrom_FB();
+
+                return true;
+            }
+        });
         sv.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String s) {
-                return false;
+                return true;
             }
 
             @Override
             public boolean onQueryTextChange(String s) {
                 tasksAdapter.getFilter().filter(s);
+
                 return true;
             }
         });
@@ -212,6 +221,7 @@ public class MainActivity extends AppCompatActivity {
                             }
                             tasksAdapter.clear();//ניקוי המתאם מכל הנתונים
                             tasksAdapter.addAll(arrayList);//הוספת כל הנתונים למתאם
+                            tasksAdapter.setOrginal(arrayList);
                         }
                         else{
                             Toast.makeText(MainActivity.this, "Error Reading data"+task.getException().getMessage(), Toast.LENGTH_SHORT).show();
@@ -313,7 +323,7 @@ public class MainActivity extends AppCompatActivity {
         spnrSubject.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-              //  readTaskFrom_FB();
+                readTaskFrom_FB();
 //                //استخراج الموضوع حسب رقمه الترتيبي i
 //                String item = subjectAdapter.getItem(i);
 //                if(item.equals("ALL"))//هذه يعني عرض جميع المهام
