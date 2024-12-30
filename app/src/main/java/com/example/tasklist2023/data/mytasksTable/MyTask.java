@@ -10,8 +10,9 @@ public class MyTask
 {
     public String id;
     public String sbjId;
-    @PrimaryKey(autoGenerate = true)
+
     /** رقم المهمة */
+    @PrimaryKey(autoGenerate = true)
     public long keyId;
     /** درجة الاهمية 1-5 */
     public int importance;

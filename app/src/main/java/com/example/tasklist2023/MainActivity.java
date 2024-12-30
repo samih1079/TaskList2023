@@ -107,7 +107,6 @@ public class MainActivity extends AppCompatActivity {
         MyTaskQuery taskQuery = db.getMyTaskQuery();
 
         List<MyTask> allTasks = taskQuery.getAllTasks();
-
         ArrayAdapter<MyTask> taksAdapter=new ArrayAdapter<MyTask>(this, android.R.layout.simple_list_item_1);
         taksAdapter.addAll(allTasks);
         lstTasks.setAdapter(taksAdapter);
