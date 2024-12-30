@@ -6,92 +6,142 @@
     android:layout_height="match_parent"
     tools:context=".AddTaskActivity">
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="wrap_content">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_margin="20dp"
-            android:orientation="horizontal">
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-            <Button
-                android:id="@+id/btnSaveTask"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:text="Save"
-                app:cornerRadius="10dp" />
-
-            <Button
-                android:id="@+id/btnCancelTask"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:text="Cancel"
-                app:cornerRadius="10dp" />
-        </LinearLayout>
-
-        <TextView
-            android:id="@+id/tvImportance"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Importance:" />
-
-        <SeekBar
-            android:id="@+id/skbrImportance"
-            style="@style/Widget.AppCompat.SeekBar.Discrete"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:max="5"
-            android:progress="1" />
-
-
-        <TextView
-            android:id="@+id/textView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Subject (Chooose or Write)" />
-
-        <AutoCompleteTextView
-            android:id="@+id/autoEtSubj"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:inputType="textAutoComplete" />
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            app:boxCornerRadiusBottomEnd="20dp"
-            app:boxCornerRadiusBottomStart="20dp"
-            app:boxCornerRadiusTopEnd="20dp"
-            app:boxCornerRadiusTopStart="20dp">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etShortTitle"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Short Title" />
-        </com.google.android.material.textfield.TextInputLayout>
+                android:layout_margin="10dp"
+                android:orientation="horizontal">
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            app:boxCornerRadiusBottomEnd="20dp"
-            app:boxCornerRadiusBottomStart="20dp"
-            app:boxCornerRadiusTopEnd="20dp"
-            app:boxCornerRadiusTopStart="20dp">
+                <Button
+                    android:id="@+id/btnSaveTask"
+                    style="@style/MyButtonStyle"
+                    android:text="Save" />
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etText"
+                <Button
+                    android:id="@+id/btnCancelTask"
+                    style="@style/MyButtonStyle"
+                    android:text="Cancel" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tvImportance"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Importance:" />
+
+            <SeekBar
+                android:id="@+id/skbrImportance"
+                style="@style/Widget.AppCompat.SeekBar.Discrete"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:max="5"
+                android:progress="1" />
+
+
+            <TextView
+                android:id="@+id/textView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Subject (Chooose or Write)" />
+
+            <AutoCompleteTextView
+                android:id="@+id/autoEtSubj"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:inputType="textAutoComplete" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                app:boxCornerRadiusBottomEnd="20dp"
+                app:boxCornerRadiusBottomStart="20dp"
+                app:boxCornerRadiusTopEnd="20dp"
+                app:boxCornerRadiusTopStart="20dp">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etShortTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Short Title" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                app:boxCornerRadiusBottomEnd="20dp"
+                app:boxCornerRadiusBottomStart="20dp"
+                app:boxCornerRadiusTopEnd="20dp"
+                app:boxCornerRadiusTopStart="20dp">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etText"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:hint="Text" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <Button
+                android:id="@+id/btnPickContact"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Pick Contact" />
+
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:hint="Text" />
-        </com.google.android.material.textfield.TextInputLayout>
+                android:gravity="center"
+                android:orientation="horizontal">
 
-    </LinearLayout>
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/textView4"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Pick Image" />
+
+                    <ImageButton
+                        android:id="@+id/imgBtn"
+                        android:layout_width="150dp"
+                        android:layout_height="150dp"
+                        android:layout_gravity="center"
+                        android:scaleType="centerCrop"
+                        app:srcCompat="@drawable/androidparty" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/textView3"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Pick Video" />
+
+                    <VideoView
+                        android:id="@+id/vidV"
+                        android:layout_width="150dp"
+                        android:layout_height="150dp" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
 </RelativeLayout>

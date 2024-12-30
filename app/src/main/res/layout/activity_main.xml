@@ -13,6 +13,7 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
         android:clickable="true"
+        style="@style/MyButtonStyle"
         app:srcCompat="@android:drawable/ic_input_add" />
 
     <LinearLayout
@@ -24,7 +25,7 @@
             android:id="@+id/srchV"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#F6D1D1" />
+            />
 
         <Spinner
             android:id="@+id/spnrSubject"
@@ -35,7 +36,7 @@
             android:id="@+id/lstvTasks"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#DAC4E6" />
+             />
     </LinearLayout>
 
 </RelativeLayout>

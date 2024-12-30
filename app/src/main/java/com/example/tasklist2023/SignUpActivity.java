@@ -18,10 +18,15 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+/**
+ * מסך רישום לפי מיל וסיסמא
+ */
 public class SignUpActivity extends AppCompatActivity {
     private Button btnSave, btnCancel;
     private TextInputEditText etName, etEmail,
             etPassword, etRePassword, etPhone;
+    //بناء الكائن الذي سيتم حفظه
+    MyUser user=new MyUser();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -120,7 +125,7 @@ public class SignUpActivity extends AppCompatActivity {
         }
         if (name.length() < 2) {
             isAllOk = false;
-            etPhone.setError("at least 2 letters");
+            etName.setError("at least 8 letters");
         }
         if (isAllOk) {
             //עצם לביצוע רישום كائن لعملية التسجيل
@@ -148,9 +153,9 @@ public class SignUpActivity extends AppCompatActivity {
 
         //مؤشر لقاعدة البيانات
         FirebaseFirestore db = FirebaseFirestore.getInstance();
+        //استخراج الرقم المميز للمستعمل الذي سجل الدخول
         String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-        MyUser user=new MyUser();
         user.setEmail(email);
         user.setFullName(name);
         user.setPhone(phone);
@@ -167,7 +172,6 @@ public class SignUpActivity extends AppCompatActivity {
                 else
                 {
                     Toast.makeText(SignUpActivity.this, "Failed to add User", Toast.LENGTH_SHORT).show();
-
                 }
             }
         });

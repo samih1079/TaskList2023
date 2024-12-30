@@ -6,6 +6,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 
+/**
+ * מסך המתנה ל 3 שניות כולל לוגו ורקע
+ */
 public class SplashScreenActivity extends AppCompatActivity {
 
     @Override
