@@ -22,6 +22,7 @@ import com.google.firebase.auth.FirebaseAuth;
  * מסך כניסה בעזרת מיל וסיסמא
  */
 public class SignInActivity extends AppCompatActivity {
+
     private TextInputEditText etEamil, etPassword;
     private Button btnSignUp;
 
@@ -29,14 +30,15 @@ public class SignInActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_in);//بناء واجهة المستعمل- كل الكائنات الموجودة على الواجهة
+
+        etEamil = findViewById(R.id.etEmail);//وضع مؤشر\صفة على الكائن المبني بواجهة المستعمل
+        etPassword = findViewById(R.id.etPassword);
+        btnSignUp = findViewById(R.id.btnSignUp);
         if(FirebaseAuth.getInstance().getCurrentUser()!=null)
         {
             startActivity(new Intent(getApplicationContext(),MainActivity.class));
             finish();
         }
-        etEamil = findViewById(R.id.etEmail);//وضع مؤشر\صفة على الكائن المبني بواجهة المستعمل
-        etPassword = findViewById(R.id.etPassword);
-        btnSignUp = findViewById(R.id.btnSignUp);
     }
 
     public void onClickSignUp(View v) {
