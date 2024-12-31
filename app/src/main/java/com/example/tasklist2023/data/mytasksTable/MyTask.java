@@ -16,8 +16,9 @@ public class MyTask
      * מזהה ייחודי של נושא המטלה
      */
     public String sbjId;
-    @PrimaryKey(autoGenerate = true)
+
     /** رقم المهمة */
+    @PrimaryKey(autoGenerate = true)
     public long keyId;
     /** درجة الاهمية 1-5 */
     public int importance;

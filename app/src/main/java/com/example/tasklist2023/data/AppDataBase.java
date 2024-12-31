@@ -59,9 +59,7 @@ public abstract class  AppDataBase extends RoomDatabase
     {
         if(db==null)
         {
-            db = Room.databaseBuilder(context,
-                            AppDataBase.class,
-                            "samihDataBase")//اسم قاعدة اليانات
+            db = Room.databaseBuilder(context, AppDataBase.class, "samihDataBase")//اسم قاعدة اليانات
                     .fallbackToDestructiveMigration()
                     .allowMainThreadQueries()
                     .build();
