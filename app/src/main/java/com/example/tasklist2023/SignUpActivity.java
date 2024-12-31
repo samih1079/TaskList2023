@@ -44,14 +44,15 @@ public class SignUpActivity extends AppCompatActivity {
 
     public void onClick(View v) {
         if (v == btnSave) {
-           checkAndSignUP_FB();
-             //checkAndSave();
+            checkAndSignUP_FB();
+            //checkAndSave();
         }
         if (v == btnCancel) {
             finish();
         }
     }
 
+    //فحص القيم المدخلة في حقول النص وترحيلها
     private void checkAndSave() {
         boolean isAllOk = true;
         String name = etName.getText().toString();
@@ -119,6 +120,7 @@ public class SignUpActivity extends AppCompatActivity {
             etPassword.setError("Wrong Password");
             etRePassword.setError("Wrong Password");
         }
+
         if (phone.length() < 9) {
             isAllOk = false;
             etPhone.setError("Wrong Phone");
