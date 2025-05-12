@@ -30,7 +30,7 @@ import android.widget.Toast;
 import com.example.tasklist2023.data.AppDataBase;
 import com.example.tasklist2023.data.mySubjectsTable.MySubject;
 import com.example.tasklist2023.data.mySubjectsTable.MySubjectQuery;
-import com.example.tasklist2023.data.mytasksTable.MyTask;
+import com.example.tasklist2023.data.MyTask;
 import com.example.tasklist2023.data.mytasksTable.MyTaskAdapter;
 import com.example.tasklist2023.data.mytasksTable.MyTaskQuery;
 import com.google.android.gms.tasks.OnCompleteListener;

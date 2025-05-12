@@ -1,4 +1,4 @@
-package com.example.tasklist2023.data.mytasksTable;
+package com.example.tasklist2023.data;
 
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;

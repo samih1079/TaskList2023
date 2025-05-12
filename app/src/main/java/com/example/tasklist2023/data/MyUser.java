@@ -1,4 +1,4 @@
-package com.example.tasklist2023.data.usersTable;
+package com.example.tasklist2023.data;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;

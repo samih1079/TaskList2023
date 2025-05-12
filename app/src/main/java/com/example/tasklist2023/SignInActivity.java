@@ -10,7 +10,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.example.tasklist2023.data.AppDataBase;
-import com.example.tasklist2023.data.usersTable.MyUser;
+import com.example.tasklist2023.data.MyUser;
 import com.example.tasklist2023.data.usersTable.MyUserQuery;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -57,6 +57,9 @@ public class SignInActivity extends AppCompatActivity {
         //checkEmailPassw();//دالة لاستخراج وفحص فحوى حقول المُدخلة
     }
 
+    /**
+     * فحص القيم المدخلة في حقول النص ومعالجتها
+     */
     private void checkEmailPassw() {
         boolean isAllOK = true;// يحوي نتيجة فحص الحقوا ان كانت سليمة
         //استخراج النص من حقل الايميل
@@ -74,9 +77,8 @@ public class SignInActivity extends AppCompatActivity {
             isAllOK = false;
             etPassword.setError("Wrong Password");
         }
-
-        if (isAllOK)
-        {
+        // كل الحقول سليمة فلا يوجد خطأ
+        if (isAllOK) {
             Toast.makeText(this, "All OK", Toast.LENGTH_SHORT).show();
             //بناء قاعدة بيانات وارجاع مؤشر عليها1
             AppDataBase db=AppDataBase.getDB(getApplicationContext());

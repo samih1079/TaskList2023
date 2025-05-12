@@ -9,7 +9,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.example.tasklist2023.data.AppDataBase;
-import com.example.tasklist2023.data.usersTable.MyUser;
+import com.example.tasklist2023.data.MyUser;
 import com.example.tasklist2023.data.usersTable.MyUserQuery;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;

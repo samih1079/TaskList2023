@@ -2,9 +2,7 @@ package com.example.tasklist2023.data;
 
 import com.example.tasklist2023.data.mySubjectsTable.MySubject;
 import com.example.tasklist2023.data.mySubjectsTable.MySubjectQuery;
-import com.example.tasklist2023.data.mytasksTable.MyTask;
 import com.example.tasklist2023.data.mytasksTable.MyTaskQuery;
-import com.example.tasklist2023.data.usersTable.MyUser;
 import com.example.tasklist2023.data.usersTable.MyUserQuery;
 
 import android.content.Context;
